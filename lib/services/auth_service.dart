@@ -1,0 +1,263 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../constants/constants.dart';
+
+class AuthService {
+  // Shared preferences keys
+  static const String _tokenKey = 'auth_token';
+  static const String _userIdKey = 'user_id';
+  static const String _userNameKey = 'user_name';
+  static const String _userEmailKey = 'user_email';
+
+  // Build base URL
+  String get baseUrl {
+    final uri = Uri(scheme: httpScheme, host: API_URL, port: portNo);
+    return uri.toString();
+  }
+
+  // Login method - now accepts identifier (email or username) and password
+  Future<Map<String, dynamic>?> login(
+    String identifier,
+    String password,
+  ) async {
+    try {
+      final uri = Uri(
+        scheme: httpScheme,
+        host: API_URL,
+        port: portNo,
+        path: authlogin,
+      );
+
+      final response = await http.post(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': 'true',
+        },
+        body: jsonEncode({'identifier': identifier, 'password': password}),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        if (data['success'] == true) {
+          await _saveAuthData(
+            data['token'],
+            data['user']['id'].toString(),
+            data['user']['userName'],
+            data['user']['email'],
+          );
+          return data;
+        }
+      } else if (response.statusCode == 401) {
+        throw Exception('Invalid credentials');
+      }
+
+      return null;
+    } catch (e) {
+      print('Login error: $e');
+      rethrow;
+    }
+  }
+
+  // Signup method - matches controller parameters
+  Future<Map<String, dynamic>?> signup(
+    String userName,
+    String email,
+    String password,
+    String confirmPassword,
+  ) async {
+    try {
+      final uri = Uri(
+        scheme: httpScheme,
+        host: API_URL,
+        port: portNo,
+        path: authsignup,
+      );
+
+      final response = await http.post(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': 'true',
+        },
+        body: jsonEncode({
+          'userName': userName,
+          'email': email,
+          'password': password,
+          'confirmPassword': confirmPassword,
+        }),
+      );
+      if (response.statusCode == 201) {
+        final data = jsonDecode(response.body);
+
+        if (data['success'] == true) {
+          await _saveAuthData(
+            data['token'],
+            data['user']['id'].toString(),
+            data['user']['userName'],
+            data['user']['email'],
+          );
+          return data;
+        }
+      } else if (response.statusCode == 400) {
+        throw Exception('User with this email or username already exists');
+      }
+
+      return null;
+    } catch (e) {
+      print('Signup error: $e');
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>?> editNameUser(
+    String newUserName,
+    String password,
+  ) async {
+    try {
+      final uri = Uri(
+        scheme: httpScheme,
+        host: API_URL,
+        port: portNo,
+        path: editUserName,
+      );
+      final token = await getToken();
+      final response = await http.put(
+        uri,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': 'true',
+        },
+        body: jsonEncode({'userName': newUserName, 'password': password}),
+      );
+      print(json.decode(response.body));
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['success'] == true) {
+          await _updateUserName(newUserName);
+          return data;
+        }
+      }
+      if (response.statusCode == 201) {
+        final data = jsonDecode(response.body);
+
+        if (data['success'] == true) {
+          print('Username edited Successfully');
+          return data;
+        }
+      } else if (response.statusCode == 400) {
+        throw Exception('Username edit failed');
+      }
+
+      return null;
+    } catch (e) {
+      print('Editing username error: $e');
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>> checkUserExists(
+    String email,
+    String userName,
+  ) async {
+    try {
+      final uri = Uri(
+        scheme: httpScheme,
+        host: API_URL,
+        port: portNo,
+        path: checkExistingUser,
+        queryParameters: {'email': email, 'userName': userName},
+      );
+
+      final response = await http.get(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': 'true',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        throw Exception('Failed to check user existence');
+      }
+    } catch (e) {
+      print('Check user exists error: $e');
+      rethrow;
+    }
+  }
+
+  // Save authentication data to SharedPreferences
+  Future<void> _saveAuthData(
+    String token,
+    String userId,
+    String userName,
+    String email,
+  ) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_tokenKey, token);
+    await prefs.setString(_userIdKey, userId);
+    await prefs.setString(_userNameKey, userName);
+    await prefs.setString(_userEmailKey, email);
+  }
+
+  // Get stored token
+  Future<String?> getToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_tokenKey);
+  }
+
+  // Get stored user ID
+  Future<String?> getUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_userIdKey);
+  }
+
+  // Get stored user name
+  Future<String?> getUserName() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_userNameKey);
+  }
+
+  // Get stored user email
+  Future<String?> getUserEmail() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_userEmailKey);
+  }
+
+  // Check if user is logged in
+  Future<bool> isLoggedIn() async {
+    final token = await getToken();
+    return token != null && token.isNotEmpty;
+  }
+
+  // Logout method
+  Future<void> logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_tokenKey);
+    await prefs.remove(_userIdKey);
+    await prefs.remove(_userNameKey);
+    await prefs.remove(_userEmailKey);
+  }
+
+  // Get authorization headers for API calls
+  Future<Map<String, String>> getAuthHeaders() async {
+    final token = await getToken();
+    return {
+      'Content-Type': 'application/json',
+      if (token != null) 'Authorization': 'Bearer $token',
+    };
+  }
+
+  // user name update
+  Future<void> _updateUserName(String newUserName) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_userNameKey, newUserName);
+  }
+}
