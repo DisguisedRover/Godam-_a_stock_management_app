@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../../providers/auth_provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:milk_content_analysis/bloc/bloc/signup_bloc/signup_bloc.dart';
+import 'package:milk_content_analysis/bloc/event/signup_event/signup_event.dart';
+import 'package:milk_content_analysis/bloc/state/signup_state/signup_state.dart';
+import '../../constants/constants.dart';
+import '../../services/auth_service.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -10,73 +14,23 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
-  bool _passwordVisible = false;
-  bool _confirmPasswordVisible = false;
 
+  final FocusNode _confirmPasswordFocusNode = FocusNode();
+  bool _confirmPasswordVisible = false;
+  final TextEditingController _emailController = TextEditingController();
+  String? _emailError;
+  final FocusNode _emailFocusNode = FocusNode();
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _nameController = TextEditingController();
   // Focus nodes
   final FocusNode _nameFocusNode = FocusNode();
-  final FocusNode _emailFocusNode = FocusNode();
+
+  final TextEditingController _passwordController = TextEditingController();
   final FocusNode _passwordFocusNode = FocusNode();
-  final FocusNode _confirmPasswordFocusNode = FocusNode();
-
-  String? _emailError;
+  bool _passwordVisible = false;
   String? _usernameError;
-
-  Future<void> _validateAndSignUp() async {
-    if (_formKey.currentState!.validate()) {
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
-
-      setState(() {
-        _emailError = null;
-        _usernameError = null;
-      });
-
-      // Check if user exists first
-      final exists = await authProvider.checkExistingUser(
-        _nameController.text.trim(),
-        _emailController.text.trim(),
-      );
-
-      if (exists != null && mounted) {
-        if (exists['details']['emailExists'] == true) {
-          setState(() {
-            _emailError = 'Email already in use';
-          });
-          return;
-        }
-
-        if (exists['details']['usernameExists'] == true) {
-          setState(() {
-            _usernameError = 'Username already taken';
-          });
-          return;
-        }
-
-        _signUp();
-      }
-    }
-  }
-
-  void _signUp() async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-
-    final success = await authProvider.signup(
-      _nameController.text,
-      _emailController.text,
-      _passwordController.text,
-      _confirmPasswordController.text,
-    );
-
-    if (success && mounted) {
-      Navigator.pushReplacementNamed(context, '/home');
-    }
-  }
 
   @override
   void dispose() {
@@ -89,6 +43,29 @@ class _SignUpScreenState extends State<SignUpScreen> {
     _passwordFocusNode.dispose();
     _confirmPasswordFocusNode.dispose();
     super.dispose();
+  }
+
+  Future<void> _validateAndSignUp() async {
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _emailError = null;
+        _usernameError = null;
+      });
+      if (mounted) {
+        _signUp();
+      }
+    }
+  }
+
+  void _signUp() async {
+   BlocProvider.of<SignupBloc>(context).add(
+    SignupButtonPressed(
+      username: _nameController.text, 
+      email: _emailController.text, 
+      password: _passwordController.text, 
+      confirmPassword: _confirmPasswordController.text,
+      )
+   );
   }
 
   @override
@@ -108,23 +85,32 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 padding: const EdgeInsets.all(30.0),
                 child: Form(
                   key: _formKey,
-                  child: Consumer<AuthProvider>(
-                    builder: (context, authProvider, child) {
+                  child: BlocListener<SignupBloc, SignupState>(
+                      listener: (context, state){
+                        if (state is SignupSuccess){
+                          Navigator.pushReplacementNamed(context, '/home');
+                        } else if (state is SignupFailure){
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.error),));
+                        }
+                      },
+                      child: BlocBuilder<SignupBloc, SignupState>(
+                      builder: (context, state) {
                       return Column(
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
                           // Logo Placeholder
-                          CircleAvatar(
-                            radius: 50,
-                            backgroundColor: Theme.of(
-                              context,
-                            ).colorScheme.primary,
-                            child: Icon(
-                              Icons.water_drop,
-                              size: 60,
-                              color: Theme.of(context).colorScheme.onPrimary,
+                          // CircleAvatar(
+                          //   radius: 50,
+                          //   backgroundColor: Theme.of(
+                          //     context,
+                          //   ).colorScheme.primary,
+                          //   child:
+                          Image.asset(
+                              appLogo,
+                              width: 60,
+                              height: 60,
                             ),
-                          ),
+                          // ),
                           const SizedBox(height: 20),
                           Text(
                             'Create Account',
@@ -269,30 +255,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               _validateAndSignUp();
                             },
                           ),
-                          // Display error from provider
-                          if (authProvider.error != null)
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                top: 15.0,
-                                bottom: 15.0,
-                              ),
-                              child: Text(
-                                authProvider.error!,
-                                style: const TextStyle(
-                                  color: Colors.redAccent,
-                                  fontSize: 14.0,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          const SizedBox(height: 30),
-                          authProvider.isLoading
-                              ? const CircularProgressIndicator()
-                              : ElevatedButton(
-                                  onPressed: _validateAndSignUp,
-                                  child: const Text('Sign Up'),
-                                ),
-                          const SizedBox(height: 20),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -308,6 +270,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ],
                       );
                     },
+                      )   
                   ),
                 ),
               ),

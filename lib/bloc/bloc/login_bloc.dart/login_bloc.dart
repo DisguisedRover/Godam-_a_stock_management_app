@@ -19,7 +19,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   ) async {
     emit(LoginLoading());
     try {
-      final response = await _authService.login(event.email, event.password);
+      final response = await _authService.login(event.username, event.password);
       if (response != null) {
         emit(LoginSuccess(userId: response['user']['id'].toString()));
       } else {

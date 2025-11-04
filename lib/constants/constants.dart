@@ -1,6 +1,11 @@
 String httpScheme = 'https';
-String API_URL = '1c3a3ccad9ac.ngrok-free.app';
+String API_URL = '5tb7hl9j-3000.inc1.devtunnels.ms';
 int? portNo = null;
+
+// https://5tb7hl9j-3000.inc1.devtunnels.ms/
+
+
+String appLogo = 'assets/images/appLogo.png';
 
 // auth
 String authlogin = '/auth/login';

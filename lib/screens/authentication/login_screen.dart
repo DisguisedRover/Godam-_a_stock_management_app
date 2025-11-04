@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:milk_content_analysis/bloc/bloc/login_bloc.dart/login_bloc.dart';
 import 'package:milk_content_analysis/bloc/event/login_event/login_event.dart';
-import 'package:provider/provider.dart';
 import '../../bloc/state/login_state/login_state.dart';
-import '../../providers/auth_provider.dart';
+import '../../constants/constants.dart';
+
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -15,32 +15,36 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _emailController = TextEditingController();
+  // final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  bool _passwordVisible = false;
 
-  // Focus nodes to manage keyboard focus
-  final FocusNode _emailFocusNode = FocusNode();
+  // final FocusNode _emailFocusNode = FocusNode();
   final FocusNode _passwordFocusNode = FocusNode();
+
+  bool _passwordVisible = false;
+  final TextEditingController _usernameController = TextEditingController();
+  // Focus nodes to manage keyboard focus
+
+  final FocusNode _usernameFocusNode = FocusNode();
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _passwordController.dispose();
+    _usernameFocusNode.dispose();
+    _passwordFocusNode.dispose();
+    super.dispose();
+  }
 
   void _login() async {
     if (_formKey.currentState!.validate()) {
       BlocProvider.of<LoginBloc>(context).add(
         LoginButtonPressed(
-          email: _emailController.text,
+          username: _usernameController.text,
           password: _passwordController.text,
         ),
       );
     }
-  }
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    _emailFocusNode.dispose();
-    _passwordFocusNode.dispose();
-    super.dispose();
   }
 
   @override
@@ -76,18 +80,19 @@ class _LoginScreenState extends State<LoginScreen> {
                         return Column(
                           mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
-                            // Logo Placeholder
-                            CircleAvatar(
-                              radius: 50,
-                              backgroundColor: Theme.of(
-                                context,
-                              ).colorScheme.primary,
-                              child: Icon(
-                                Icons.water_drop,
-                                size: 60,
-                                color: Theme.of(context).colorScheme.onPrimary,
+                            // CircleAvatar(
+                            //   radius: 50,
+                            //   backgroundColor: Theme.of(
+                            //     context,
+                            //   ).colorScheme.primary,
+                            //   child: 
+                              Image.asset(
+                                appLogo,
+                                width: 60,
+                                height: 60,
+                                // color: Theme.of(context).colorScheme.onPrimary,
                               ),
-                            ),
+                            // ),
                             const SizedBox(height: 20),
                             Text(
                               'Welcome Back!',
@@ -95,29 +100,29 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             const SizedBox(height: 10),
                             Text(
-                              'Sign in to continue to Milk Content Analyzer',
+                              'Sign in to continue to Godam',
                               style: Theme.of(context).textTheme.bodyMedium,
                               textAlign: TextAlign.center,
                             ),
                             const SizedBox(height: 30),
                             TextFormField(
-                              controller: _emailController,
-                              focusNode: _emailFocusNode,
+                              controller: _usernameController,
+                              focusNode: _usernameFocusNode,
                               decoration: const InputDecoration(
-                                labelText: 'Email',
-                                hintText: 'Enter your email',
-                                prefixIcon: Icon(Icons.email),
+                                labelText: 'Username',
+                                hintText: 'Enter your username',
+                                prefixIcon: Icon(Icons.person_2),
                               ),
                               keyboardType: TextInputType.emailAddress,
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Please enter your email';
+                                  return 'Please enter your usermane';
                                 }
-                                if (!RegExp(
-                                  r'^[^@]+@[^@]+\.[^@]+',
-                                ).hasMatch(value)) {
-                                  return 'Please enter a valid email address';
-                                }
+                                // if (!RegExp(
+                                //   r'^[^@]+@[^@]+\.[^@]+',
+                                // ).hasMatch(value)) {
+                                //   return 'Please enter a valid email address';
+                                // }
                                 return null;
                               },
                               onFieldSubmitted: (_) {
@@ -163,7 +168,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             const SizedBox(height: 10),
                             Align(
-                              alignment: Alignment.centerRight,
+                              alignment: Alignment.centerLeft,
                               child: TextButton(
                                 onPressed: () {
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -178,7 +183,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
 
-                            const SizedBox(height: 20),
+                            const SizedBox(height: 12),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [

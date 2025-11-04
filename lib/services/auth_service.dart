@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -11,11 +12,11 @@ class AuthService {
   static const String _userNameKey = 'user_name';
   static const String _userEmailKey = 'user_email';
 
-  // Build base URL
-  String get baseUrl {
-    final uri = Uri(scheme: httpScheme, host: API_URL, port: portNo);
-    return uri.toString();
-  }
+  // // Build base URL
+  // String get baseUrl {
+  //   final uri = Uri(scheme: httpScheme, host: API_URL, port: portNo);
+  //   return uri.toString();
+  // }
 
   // Login method - now accepts identifier (email or username) and password
   Future<Map<String, dynamic>?> login(
@@ -34,19 +35,21 @@ class AuthService {
         uri,
         headers: {
           'Content-Type': 'application/json',
-          'ngrok-skip-browser-warning': 'true',
         },
         body: jsonEncode({'identifier': identifier, 'password': password}),
       );
 
+      debugPrint("Login request sent to: $uri");
+      debugPrint("Login status code: ${response.statusCode}");
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
 
+      debugPrint("Login response data: $data");
         if (data['success'] == true) {
           await _saveAuthData(
             data['token'],
             data['user']['id'].toString(),
-            data['user']['userName'],
+            data['user']['username'],
             data['user']['email'],
           );
           return data;
@@ -57,7 +60,7 @@ class AuthService {
 
       return null;
     } catch (e) {
-      print('Login error: $e');
+      debugPrint('Login error: $e');
       rethrow;
     }
   }
@@ -84,7 +87,7 @@ class AuthService {
           'ngrok-skip-browser-warning': 'true',
         },
         body: jsonEncode({
-          'userName': userName,
+          'username': userName,
           'email': email,
           'password': password,
           'confirmPassword': confirmPassword,
@@ -134,7 +137,7 @@ class AuthService {
         },
         body: jsonEncode({'userName': newUserName, 'password': password}),
       );
-      print(json.decode(response.body));
+      debugPrint(json.decode(response.body));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -147,7 +150,7 @@ class AuthService {
         final data = jsonDecode(response.body);
 
         if (data['success'] == true) {
-          print('Username edited Successfully');
+          debugPrint('Username edited Successfully');
           return data;
         }
       } else if (response.statusCode == 400) {
@@ -156,7 +159,7 @@ class AuthService {
 
       return null;
     } catch (e) {
-      print('Editing username error: $e');
+      debugPrint('Editing username error: $e');
       rethrow;
     }
   }
@@ -178,7 +181,6 @@ class AuthService {
         uri,
         headers: {
           'Content-Type': 'application/json',
-          'ngrok-skip-browser-warning': 'true',
         },
       );
 
@@ -188,7 +190,7 @@ class AuthService {
         throw Exception('Failed to check user existence');
       }
     } catch (e) {
-      print('Check user exists error: $e');
+      debugPrint('Check user exists error: $e');
       rethrow;
     }
   }
