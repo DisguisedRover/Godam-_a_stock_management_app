@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:milk_content_analysis/bloc/bloc/login_bloc.dart/login_bloc.dart';
+import 'package:milk_content_analysis/bloc/event/login_event/login_event.dart';
 import 'package:provider/provider.dart';
+import '../../bloc/state/login_state/login_state.dart';
 import '../../providers/auth_provider.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -21,17 +25,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _login() async {
     if (_formKey.currentState!.validate()) {
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
-
-      final success = await authProvider.login(
-        _emailController.text,
-        _passwordController.text,
+      BlocProvider.of<LoginBloc>(context).add(
+        LoginButtonPressed(
+          email: _emailController.text,
+          password: _passwordController.text,
+        ),
       );
-
-      if (success && mounted) {
-        Navigator.pushReplacementNamed(context, '/home');
-      }
-      // Error handling is now managed by the provider and displayed via Consumer
     }
   }
 
@@ -61,146 +60,141 @@ class _LoginScreenState extends State<LoginScreen> {
                 padding: const EdgeInsets.all(30.0),
                 child: Form(
                   key: _formKey,
-                  child: Consumer<AuthProvider>(
-                    builder: (context, authProvider, child) {
-                      return Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          // Logo Placeholder
-                          CircleAvatar(
-                            radius: 50,
-                            backgroundColor: Theme.of(
-                              context,
-                            ).colorScheme.primary,
-                            child: Icon(
-                              Icons.water_drop,
-                              size: 60,
-                              color: Theme.of(context).colorScheme.onPrimary,
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          Text(
-                            'Welcome Back!',
-                            style: Theme.of(context).textTheme.headlineLarge,
-                          ),
-                          const SizedBox(height: 10),
-                          Text(
-                            'Sign in to continue to Milk Content Analyzer',
-                            style: Theme.of(context).textTheme.bodyMedium,
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 30),
-                          TextFormField(
-                            controller: _emailController,
-                            focusNode: _emailFocusNode,
-                            decoration: const InputDecoration(
-                              labelText: 'Email',
-                              hintText: 'Enter your email',
-                              prefixIcon: Icon(Icons.email),
-                            ),
-                            keyboardType: TextInputType.emailAddress,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter your email';
-                              }
-                              if (!RegExp(
-                                r'^[^@]+@[^@]+\.[^@]+',
-                              ).hasMatch(value)) {
-                                return 'Please enter a valid email address';
-                              }
-                              return null;
-                            },
-                            onFieldSubmitted: (_) {
-                              FocusScope.of(
-                                context,
-                              ).requestFocus(_passwordFocusNode);
-                            },
-                          ),
-                          const SizedBox(height: 20),
-                          TextFormField(
-                            controller: _passwordController,
-                            focusNode: _passwordFocusNode,
-                            decoration: InputDecoration(
-                              labelText: 'Password',
-                              hintText: 'Enter your password',
-                              prefixIcon: const Icon(Icons.lock),
-                              suffixIcon: IconButton(
-                                icon: Icon(
-                                  _passwordVisible
-                                      ? Icons.visibility
-                                      : Icons.visibility_off,
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    _passwordVisible = !_passwordVisible;
-                                  });
-                                },
-                              ),
-                            ),
-                            obscureText: !_passwordVisible,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter your password';
-                              }
-                              return null;
-                            },
-                            onFieldSubmitted: (_) {
-                              _login();
-                            },
-                          ),
-                          const SizedBox(height: 10),
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: TextButton(
-                              onPressed: () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text(
-                                      'Forgot password functionality not implemented yet.',
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: const Text('Forgot Password?'),
-                            ),
-                          ),
-                          // Display error from provider
-                          if (authProvider.error != null)
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 15.0),
-                              child: Text(
-                                authProvider.error!,
-                                style: const TextStyle(
-                                  color: Colors.redAccent,
-                                  fontSize: 14.0,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          const SizedBox(height: 20),
-                          authProvider.isLoading
-                              ? const CircularProgressIndicator()
-                              : ElevatedButton(
-                                  onPressed: _login,
-                                  child: const Text('Login'),
-                                ),
-                          const SizedBox(height: 20),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Text("Don't have an account?"),
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.pushNamed(context, '/signup');
-                                },
-                                child: const Text('Sign Up'),
-                              ),
-                            ],
-                          ),
-                        ],
-                      );
+                  child: BlocListener<LoginBloc, LoginState>(
+                    listener: (context, state) {
+                      if (state is LoginSuccess) {
+                        Navigator.pushReplacementNamed(context, '/home');
+                      } else if (state is LoginFailure) {
+                        ScaffoldMessenger.of(
+                          context,
+                        ).showSnackBar(SnackBar(content: Text(state.error)));
+                      }
                     },
+
+                    child: BlocBuilder<LoginBloc, LoginState>(
+                      builder: (context, state) {
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            // Logo Placeholder
+                            CircleAvatar(
+                              radius: 50,
+                              backgroundColor: Theme.of(
+                                context,
+                              ).colorScheme.primary,
+                              child: Icon(
+                                Icons.water_drop,
+                                size: 60,
+                                color: Theme.of(context).colorScheme.onPrimary,
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            Text(
+                              'Welcome Back!',
+                              style: Theme.of(context).textTheme.headlineLarge,
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              'Sign in to continue to Milk Content Analyzer',
+                              style: Theme.of(context).textTheme.bodyMedium,
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 30),
+                            TextFormField(
+                              controller: _emailController,
+                              focusNode: _emailFocusNode,
+                              decoration: const InputDecoration(
+                                labelText: 'Email',
+                                hintText: 'Enter your email',
+                                prefixIcon: Icon(Icons.email),
+                              ),
+                              keyboardType: TextInputType.emailAddress,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter your email';
+                                }
+                                if (!RegExp(
+                                  r'^[^@]+@[^@]+\.[^@]+',
+                                ).hasMatch(value)) {
+                                  return 'Please enter a valid email address';
+                                }
+                                return null;
+                              },
+                              onFieldSubmitted: (_) {
+                                FocusScope.of(
+                                  context,
+                                ).requestFocus(_passwordFocusNode);
+                              },
+                            ),
+                            const SizedBox(height: 20),
+                            TextFormField(
+                              controller: _passwordController,
+                              focusNode: _passwordFocusNode,
+                              decoration: InputDecoration(
+                                labelText: 'Password',
+                                hintText: 'Enter your password',
+                                prefixIcon: const Icon(Icons.lock),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _passwordVisible
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _passwordVisible = !_passwordVisible;
+                                    });
+                                  },
+                                ),
+                              ),
+                              obscureText: !_passwordVisible,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter your password';
+                                }
+                                return null;
+                              },
+                              onFieldSubmitted: (_) {
+                                _login();
+                              },
+                            ),
+                            const SizedBox(height: 10),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: TextButton(
+                                onPressed: () {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        'Forgot password functionality not implemented yet.',
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: const Text('Forgot Password?'),
+                              ),
+                            ),
+
+                            const SizedBox(height: 20),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Text("Don't have an account?"),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pushNamed(context, '/signup');
+                                  },
+                                  child: const Text('Sign Up'),
+                                ),
+                              ],
+                            ),
+                          ],
+                        );
+                      },
+                    ),
                   ),
                 ),
               ),

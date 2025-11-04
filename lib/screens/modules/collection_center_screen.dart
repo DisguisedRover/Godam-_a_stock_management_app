@@ -653,7 +653,7 @@ class _CollectionCenterScreenState extends State<CollectionCenterScreen> {
           // const Text('v6.3.1.0/6.3.1.0'),
           // Text('Logged In As: ${authProvider.user?.name ?? 'Unknown'}'),
           const Text('Economic Year: 2082/2083'),
-          const Text('License To: CMP Trade Concern'),
+          const Text('License To: irajan Gaha'),
         ],
       ),
     );
