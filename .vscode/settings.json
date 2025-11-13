@@ -56,5 +56,6 @@
   "C_Cpp_Runner.showCompilationTime": false,
   "C_Cpp_Runner.useLinkTimeOptimization": false,
   "C_Cpp_Runner.msvcSecureNoWarnings": false,
-  "dart.flutterSdkPath": ".fvm/versions/3.32.8"
+  "dart.flutterSdkPath": ".fvm/versions/3.32.8",
+  "java.configuration.updateBuildConfiguration": "interactive"
 }

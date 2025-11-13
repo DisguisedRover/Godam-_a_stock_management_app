@@ -485,7 +485,7 @@ class _MasterDataScreenState extends State<MasterDataScreen> {
         children: [
           Text('Copyright © 2025'),
           Text('Economic Year: 2082/2083'),
-          Text('License To: CMP Trade Concern'),
+          Text('License To: Nirajan Gaha'),
         ],
       ),
     );

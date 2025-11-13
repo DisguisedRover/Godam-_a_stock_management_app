@@ -1,4 +1,4 @@
-package com.example.dektop_app
+package com.godam.app
 
 import io.flutter.embedding.android.FlutterActivity
 

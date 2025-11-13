@@ -801,7 +801,7 @@ class _DeliveryEntryScreenState extends State<DeliveryEntryScreen> {
         children: [
           Text('Copyright © 2025'),
           Text('Economic Year: 2082/2083'),
-          Text('License To: CMP Trade Concern'),
+          Text('License To: Nirajan Gaha'),
         ],
       ),
     );

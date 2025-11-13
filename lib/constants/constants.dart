@@ -1,6 +1,9 @@
 String httpScheme = 'https';
-String API_URL = '1c3a3ccad9ac.ngrok-free.app';
+String API_URL = 'cba705cf81c1.ngrok-free.app';
 int? portNo = null;
+
+
+String appLogo = 'assets/images/appLogo.png';
 
 // auth
 String authlogin = '/auth/login';
@@ -11,8 +14,10 @@ String editUserName = '/auth/editUserName';
 // product
 String saveProduct = '/product/saveProduct';
 String editProduct = '/product/editProduct';
-String deleteProduct = '/product/deleteProduct';
+String deleteproduct = '/product/deleteProduct';
 String getProduct = '/product/getAllProduct';
+String getProductbyId = '/product/getProductById';
+
 
 // product detail
 String saveProductDetail = '/product/saveProductDetail';
