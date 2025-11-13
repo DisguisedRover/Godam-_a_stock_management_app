@@ -26,14 +26,22 @@ class ProductService {
       debugPrint("Get products request sent to: $uri");
       debugPrint("Get products status code: ${response.statusCode}");
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         final data = jsonDecode(response.body);
         debugPrint("Get products response: $data");
 
-        if (data['success'] == true) {
+        if (data is List){
+
+          return data.map((json) => Product.fromJson(json)).toList();
+        }else if (data['success'] == true) {
           final List<dynamic> productsJson = data['products'];
           return productsJson.map((json) => Product.fromJson(json)).toList();
-        } else {
+        }else if (data is Map && data.containsKey('products')){
+
+          final List<dynamic> productJson = data['products'];
+          return productJson.map((json) => Product.fromJson(json)).toList();
+        }
+         else {
           throw Exception(data['message'] ?? 'Failed to load products');
         }
       } else {
@@ -60,23 +68,26 @@ class ProductService {
 
       debugPrint("Get product by ID request sent to: $uri");
       debugPrint("Get product status code: ${response.statusCode}");
+      debugPrint("Get product by ID response: ${response.body}");
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        debugPrint("Get product response: $data");
-
-        if (data['success'] == true) {
-          return Product.fromJson(data['product']);
-        } else {
-          throw Exception(data['message'] ?? 'Failed to load product');
-        }
+     
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      
+      if (data is Map<String, dynamic> && data.containsKey('product_id')) {
+        return Product.fromJson(data);
       } else {
-        throw Exception('Failed to load product: ${response.statusCode}');
+        throw Exception('Invalid product data format');
       }
-    } catch (e) {
-      debugPrint('Get product by ID error: $e');
-      rethrow;
+    } else if (response.statusCode == 404) {
+      throw Exception('Product not found');
+    } else {
+      throw Exception('Failed to load product: ${response.statusCode}');
     }
+  } catch (e) {
+    debugPrint('Get product by ID error: $e');
+    rethrow;
+  }
   }
 
   Future<Product> createProduct(Product product) async {
@@ -121,81 +132,81 @@ class ProductService {
     }
   }
 
-  Future<Product> updateProduct(int productId, Product product) async {
-    try {
-      final uri = Uri(
-        scheme: httpScheme,
-        host: API_URL,
-        port: portNo,
-        path: '$editProduct/$productId',
-      );
+  Future<bool> updateProduct(int productId, Product product) async {
+  try {
+    final uri = Uri(
+      scheme: httpScheme,
+      host: API_URL,
+      port: portNo,
+      path: '$editProduct/$productId',
+    );
 
-      final headers = await _authService.getAuthHeaders();
+    final headers = await _authService.getAuthHeaders();
 
-      final response = await http.put(
-        uri,
-        headers: headers,
-        body: jsonEncode(product.toJson()),
-      );
+    final response = await http.put(
+      uri,
+      headers: headers,
+      body: jsonEncode(product.toJson()),
+    );
 
-      debugPrint("Update product request sent to: $uri");
-      debugPrint("Update product body: ${product.toJson()}");
-      debugPrint("Update product status code: ${response.statusCode}");
+    debugPrint("Update product request sent to: $uri");
+    debugPrint("Update product body: ${product.toJson()}");
+    debugPrint("Update product status code: ${response.statusCode}");
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        debugPrint("Update product response: $data");
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      debugPrint("Update product response: $data");
 
-        if (data['success'] == true) {
-          return Product.fromJson(data['product']);
-        } else {
-          throw Exception(data['message'] ?? 'Failed to update product');
-        }
-      } else if (response.statusCode == 400) {
-        final data = jsonDecode(response.body);
-        throw Exception(data['message'] ?? 'Validation error');
-      } else {
-        throw Exception('Failed to update product: ${response.statusCode}');
-      }
-    } catch (e) {
-      debugPrint('Update product error: $e');
-      rethrow;
+      // Check if the message indicates success
+      final message = data['message']?.toString().toLowerCase() ?? '';
+      return message.contains('success') || message.contains('updated');
+    } else if (response.statusCode == 400) {
+      final data = jsonDecode(response.body);
+      throw Exception(data['error'] ?? data['message'] ?? 'Validation error');
+    } else {
+      throw Exception('Failed to update product: ${response.statusCode}');
     }
+  } catch (e) {
+    debugPrint('Update product error: $e');
+    rethrow;
   }
+}
 
-  Future<bool> deleteProduct(int productId) async {
-    try {
-      final uri = Uri(
-        scheme: httpScheme,
-        host: API_URL,
-        port: portNo,
-        path: '$deleteproduct/$productId',
-      );
+Future<bool> deleteProduct(int productId) async {
+  try {
+    final uri = Uri(
+      scheme: httpScheme,
+      host: API_URL,
+      port: portNo,
+      path: '$deleteproduct/$productId',
+    );
 
-      final headers = await _authService.getAuthHeaders();
-      headers['ngrok-skip-browser-warning'] = 'true';
+    final headers = await _authService.getAuthHeaders();
 
-      final response = await http.delete(uri, headers: headers);
+    final response = await http.delete(uri, headers: headers);
 
-      debugPrint("Delete product request sent to: $uri");
-      debugPrint("Delete product status code: ${response.statusCode}");
+    debugPrint("Delete product request sent to: $uri");
+    debugPrint("Delete product status code: ${response.statusCode}");
 
-      if (response.statusCode == 200 || response.statusCode == 204) {
-        final data = response.body.isNotEmpty 
-            ? jsonDecode(response.body) 
-            : {'success': true};
-        debugPrint("Delete product response: $data");
+    if (response.statusCode == 200 || response.statusCode == 204) {
+      final data = response.body.isNotEmpty 
+          ? jsonDecode(response.body) 
+          : {'message': 'Product deleted successfully'};
+      debugPrint("Delete product response: $data");
 
-        return data['success'] == true;
-      } else {
-        throw Exception('Failed to delete product: ${response.statusCode}');
+      final message = data['message']?.toString().toLowerCase() ?? '';
+      if (message.contains('success') || message.contains('deleted')) {
+        return true;
       }
-    } catch (e) {
-      debugPrint('Delete product error: $e');
-      rethrow;
+      return false;
+    } else {
+      throw Exception('Failed to delete product: ${response.statusCode}');
     }
+  } catch (e) {
+    debugPrint('Delete product error: $e');
+    rethrow;
   }
-
+}
   Future<List<Product>> searchProducts({
     String? category,
     String? type,

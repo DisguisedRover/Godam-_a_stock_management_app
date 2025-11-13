@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:milk_content_analysis/constants/constants.dart';
 import 'package:provider/provider.dart';
 
-import '../model/milk_analysis_model.dart';
-import '../providers/milk_mock_data_provider.dart';
 import '../providers/theme_provider.dart';
 import '../services/auth_service.dart';
 
@@ -19,6 +16,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final AuthService _authService = AuthService();
   bool _isLoading = true;
   String? _userName;
+  int _currentIndex = 0;
 
   @override
   void didChangeDependencies() {
@@ -45,78 +43,206 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Widget _buildDrawerItem(
-    BuildContext context,
-    String title,
-    IconData icon,
-    String routeName,
-  ) {
-    return ListTile(
-      leading: Icon(icon, size: 24),
-      title: Text(
-        title,
-        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              fontWeight: FontWeight.w500,
-            ),
-      ),
-      onTap: () {
-        Navigator.pop(context);
-        Navigator.pushNamed(context, routeName);
-      },
-    );
+  String _getGreetingEmoji() {
+    final hour = DateTime.now().hour;
+    if (hour < 12) {
+      return '☀️';
+    } else if (hour < 17) {
+      return '🌤️';
+    } else {
+      return '🌙';
+    }
   }
 
   Widget _buildMetricCard(
     BuildContext context,
     String title,
     String value,
+    String subtitle,
     IconData icon,
-    Color iconColor,
+    Color color,
+  ) {
+    return Container(
+      width: 160,
+      child: Card(
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(
+            color: Theme.of(context).dividerColor.withOpacity(0.1),
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(icon, color: color, size: 24),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                value,
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                title,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                    ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                subtitle,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                    ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFeatureCard(
+    BuildContext context,
+    String title,
+    String description,
+    IconData icon,
+    Color color,
+    VoidCallback onTap,
   ) {
     return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(
+          color: Theme.of(context).dividerColor.withOpacity(0.1),
+        ),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(20),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Row(
+            children: [
+              Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Icon(icon, color: color, size: 28),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      description,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                          ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.arrow_forward_ios_rounded,
+                size: 16,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBottomNavigationBar() {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(25),
+        color: Theme.of(context).colorScheme.surface,
+        boxShadow: [
+          BoxShadow(
+            blurRadius: 20,
+            color: Colors.black.withOpacity(0.1),
+          ),
+        ],
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(8),
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: iconColor.withOpacity(0.15),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(icon, size: 24, color: iconColor),
+            _buildNavItem(Icons.home_rounded, 'Home', 0),
+            _buildNavItem(Icons.category_rounded, 'Products', 1),
+            _buildNavItem(Icons.analytics_rounded, 'Reports', 2),
+            _buildNavItem(Icons.person_rounded, 'Profile', 3),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavItem(IconData icon, String label, int index) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _currentIndex = index;
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          color: _currentIndex == index
+              ? Theme.of(context).colorScheme.primary.withOpacity(0.1)
+              : Colors.transparent,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 24,
+              color: _currentIndex == index
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
             ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    title,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w500,
-                          color: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.color
-                              ?.withOpacity(0.7),
-                        ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: _currentIndex == index
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                    fontWeight: _currentIndex == index ? FontWeight.w600 : FontWeight.normal,
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    value,
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
-                        ),
-                  ),
-                ],
-              ),
             ),
           ],
         ),
@@ -124,227 +250,78 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildQuickActionButton(
-    BuildContext context,
-    String title,
-    IconData icon,
-    String routeName,
-  ) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16.0),
-        onTap: () {
-          Navigator.pushNamed(context, routeName);
-        },
-        child: Container(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: 52,
-                height: 52,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  icon,
-                  size: 28,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                title,
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                    ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAnalysisResultCard(
-    BuildContext context,
-    MilkAnalysisResult analysis,
-  ) {
-    return Card(
-      elevation: 2,
-      margin: const EdgeInsets.only(bottom: 12.0),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16.0),
-        onTap: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Viewing details for ${analysis.id}')),
-          );
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Text(
-                      'Analysis ID: ${analysis.id}',
-                      style: Theme.of(context)
-                          .textTheme
-                          .titleMedium
-                          ?.copyWith(fontWeight: FontWeight.bold),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  Icon(
-                    Icons.chevron_right,
-                    size: 24,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Text(
-                DateFormat('MMM dd, yyyy • HH:mm').format(analysis.date),
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context)
-                          .textTheme
-                          .bodyMedium
-                          ?.color
-                          ?.withOpacity(0.6),
-                    ),
-              ),
-              const SizedBox(height: 16),
-              Wrap(
-                spacing: 8.0,
-                runSpacing: 8.0,
-                children: [
-                  _buildInfoChip(
-                    context,
-                    'Fat',
-                    '${analysis.fatPercentage.toStringAsFixed(1)}%',
-                    Colors.orange,
-                  ),
-                  _buildInfoChip(
-                    context,
-                    'Protein',
-                    '${analysis.proteinPercentage.toStringAsFixed(1)}%',
-                    Colors.green,
-                  ),
-                  _buildInfoChip(
-                    context,
-                    'Lactose',
-                    '${analysis.lactosePercentage.toStringAsFixed(1)}%',
-                    Colors.blue,
-                  ),
-                  _buildInfoChip(
-                    context,
-                    'SNF',
-                    '${analysis.snfPercentage.toStringAsFixed(1)}%',
-                    Colors.purple,
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInfoChip(
-    BuildContext context,
-    String label,
-    String value,
-    Color color,
-  ) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.3)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 10,
-            height: 10,
-            decoration: BoxDecoration(
-              color: color,
-              shape: BoxShape.circle,
-            ),
-          ),
-          const SizedBox(width: 8),
-          Text(
-            '$label: $value',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: color.withOpacity(0.9),
-                  fontSize: 13,
-                ),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    final List<MilkAnalysisResult> recentAnalyses =
-        MockDataProvider.getRecentAnalyses(5);
-    final double avgFat = MockDataProvider.getAverageFat();
-    final double avgProtein = MockDataProvider.getAverageProtein();
-    final double avgLactose = MockDataProvider.getAverageLactose();
-
     final themeProvider = Provider.of<ThemeProvider>(context);
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
+      backgroundColor: colorScheme.background,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         leading: Padding(
           padding: const EdgeInsets.all(8.0),
           child: CircleAvatar(
-            backgroundColor: Theme.of(context).colorScheme.onPrimary,
+            backgroundColor: colorScheme.primary.withOpacity(0.1),
             child: Image.asset(
-              appLogo,
-              width: 40,
-              height: 40,
+              appLogo,            
             ),
           ),
         ),
-        title: const Text('Godam'),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Godam',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: colorScheme.onBackground,
+                  ),
+            ),
+            Text(
+              'Stock Management',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onBackground.withOpacity(0.6),
+                  ),
+            ),
+          ],
+        ),
         actions: [
           IconButton(
-            icon: Icon(
-              themeProvider.themeMode == ThemeMode.dark
-                  ? Icons.light_mode
-                  : Icons.dark_mode,
+            icon: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: colorScheme.primary.withOpacity(0.1),
+              ),
+              child: Icon(
+                themeProvider.themeMode == ThemeMode.dark
+                    ? Icons.light_mode_rounded
+                    : Icons.dark_mode_rounded,
+                size: 20,
+                color: colorScheme.primary,
+              ),
             ),
-            tooltip: 'Toggle Theme',
             onPressed: () {
               themeProvider.toggleTheme();
             },
           ),
           PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert),
+            icon: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: colorScheme.primary.withOpacity(0.1),
+              ),
+              child: Icon(
+                Icons.more_vert_rounded,
+                size: 20,
+                color: colorScheme.primary,
+              ),
+            ),
             onSelected: (value) {
               switch (value) {
-                case 'notifications':
-                  Navigator.pushNamed(context, '/notifications');
-                  break;
                 case 'settings':
                   Navigator.pushNamed(context, '/settings');
                   break;
@@ -354,339 +331,220 @@ class _HomeScreenState extends State<HomeScreen> {
               }
             },
             itemBuilder: (context) => [
-              const PopupMenuItem(
-                value: 'notifications',
-                child: Row(
-                  children: [
-                    Icon(Icons.notifications),
-                    SizedBox(width: 12),
-                    Text('Notifications'),
-                  ],
-                ),
-              ),
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'settings',
                 child: Row(
                   children: [
-                    Icon(Icons.settings),
-                    SizedBox(width: 12),
+                    Icon(Icons.settings_rounded, color: colorScheme.onSurface),
+                    const SizedBox(width: 12),
                     Text('Settings'),
                   ],
                 ),
               ),
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'logout',
                 child: Row(
                   children: [
-                    Icon(Icons.logout),
-                    SizedBox(width: 12),
+                    Icon(Icons.logout_rounded, color: colorScheme.onSurface),
+                    const SizedBox(width: 12),
                     Text('Logout'),
                   ],
                 ),
               ),
             ],
           ),
+          const SizedBox(width: 8),
         ],
       ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            DrawerHeader(
+            // Header Section
+            Container(
+              padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary,
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    colorScheme.primary.withOpacity(0.8),
+                    colorScheme.primary,
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(24),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.end,
+              child: Row(
                 children: [
-                  Image.asset(
-                    appLogo,
-                    width: 60,
-                    height: 60,
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    'Milk Analyzer',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              _getGreetingEmoji(),
+                              style: const TextStyle(fontSize: 24),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              _getGreeting(),
+                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    color: Colors.white.withOpacity(0.9),
+                                  ),
+                            ),
+                          ],
                         ),
+                        const SizedBox(height: 8),
+                        _isLoading
+                            ? Container(
+                                height: 24,
+                                width: 120,
+                                child: LinearProgressIndicator(
+                                  backgroundColor: Colors.white.withOpacity(0.3),
+                                  color: Colors.white,
+                                ),
+                              )
+                            : Text(
+                                _userName ?? 'User',
+                                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                              ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Ready to manage your inventory?',
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: Colors.white.withOpacity(0.8),
+                              ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.person_outlined,
+                      color: Colors.white,
+                      size: 40,
+                    ),
                   ),
                 ],
               ),
             ),
-            _buildDrawerItem(context, 'Master', Icons.category, '/master'),
-            _buildDrawerItem(
-                context, 'Purchase', Icons.shopping_cart, '/purchase'),
-            _buildDrawerItem(context, 'Sales', Icons.point_of_sale, '/sales'),
-            _buildDrawerItem(context, 'Reports', Icons.bar_chart, '/reports'),
+            const SizedBox(height: 32),
+
+            // Quick Stats Section
+            Text(
+              'Quick Stats',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: colorScheme.onBackground,
+                  ),
+            ),
+            const SizedBox(height: 16),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  _buildMetricCard(
+                    context,
+                    'Total Products',
+                    '24',
+                    'In stock',
+                    Icons.inventory_2_rounded,
+                    Colors.blue,
+                  ),
+                  const SizedBox(width: 12),
+                  _buildMetricCard(
+                    context,
+                    'Categories',
+                    '8',
+                    'Active',
+                    Icons.category_rounded,
+                    Colors.green,
+                  ),
+                  const SizedBox(width: 12),
+                  _buildMetricCard(
+                    context,
+                    'Low Stock',
+                    '3',
+                    'Need restock',
+                    Icons.warning_amber_rounded,
+                    Colors.orange,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 32),
+
+            // Features Section
+            Text(
+              'Features',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: colorScheme.onBackground,
+                  ),
+            ),
+            const SizedBox(height: 16),
+            Column(
+              children: [
+                _buildFeatureCard(
+                  context,
+                  'Product Master',
+                  'Manage your product catalog and inventory',
+                  Icons.category_rounded,
+                  Colors.purple,
+                  () {
+                    Navigator.pushNamed(context, '/product_master');
+                  },
+                ),
+                const SizedBox(height: 12),
+                _buildFeatureCard(
+                  context,
+                  'Stock Management',
+                  'Track inventory levels and movements',
+                  Icons.analytics_rounded,
+                  Colors.blue,
+                  () {
+                    // Navigate to stock management
+                  },
+                ),
+                const SizedBox(height: 12),
+                _buildFeatureCard(
+                  context,
+                  'Reports & Analytics',
+                  'View insights and generate reports',
+                  Icons.bar_chart_rounded,
+                  Colors.green,
+                  () {
+                    // Navigate to reports
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: 100), // Space for bottom navigation
           ],
         ),
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Greeting Card
-              Card(
-                elevation: 4,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20.0),
-                ),
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.9),
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.waving_hand,
-                            size: 28,
-                            color: Theme.of(context).colorScheme.onPrimary,
-                          ),
-                          const Spacer(),
-                          Icon(
-                            Icons.notifications,
-                            size: 24,
-                            color: Theme.of(context).colorScheme.onPrimary,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        _getGreeting(),
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              color: Theme.of(context).colorScheme.onPrimary,
-                              fontWeight: FontWeight.normal,
-                            ),
-                      ),
-                      _isLoading
-                          ? const SizedBox(
-                              height: 24,
-                              width: 24,
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2,
-                              ),
-                            )
-                          : Text(
-                              _userName ?? 'User',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headlineMedium
-                                  ?.copyWith(
-                                    color: Theme.of(context).colorScheme.onPrimary,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                            ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Welcome to your Godam dashboard.',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onPrimary
-                                  .withOpacity(0.9),
-                            ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // Key Metrics Section
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                child: Text(
-                  'Key Metrics Overview',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Column(
-                children: <Widget>[
-                  _buildMetricCard(
-                    context,
-                    'Average Fat Content',
-                    '${avgFat.toStringAsFixed(2)}%',
-                    Icons.opacity,
-                    Colors.orange.shade700,
-                  ),
-                  const SizedBox(height: 12),
-                  _buildMetricCard(
-                    context,
-                    'Average Protein Content',
-                    '${avgProtein.toStringAsFixed(2)}%',
-                    Icons.egg,
-                    Colors.green.shade700,
-                  ),
-                  const SizedBox(height: 12),
-                  _buildMetricCard(
-                    context,
-                    'Average Lactose Content',
-                    '${avgLactose.toStringAsFixed(2)}%',
-                    Icons.water_drop,
-                    Colors.blue.shade700,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-
-              // Quick Actions Section
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Quick Actions',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-              GridView.count(
-                crossAxisCount: 3,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                childAspectRatio: 0.85,
-                crossAxisSpacing: 8,
-                mainAxisSpacing: 8,
-                children: <Widget>[
-                  _buildQuickActionButton(
-                    context,
-                    'New Analysis',
-                    Icons.add_chart,
-                    '/new_analysis',
-                  ),
-                  _buildQuickActionButton(
-                    context,
-                    'History',
-                    Icons.history,
-                    '/history',
-                  ),
-                  _buildQuickActionButton(
-                    context,
-                    'Reports',
-                    Icons.bar_chart,
-                    '/reports',
-                  ),
-                  _buildQuickActionButton(
-                    context,
-                    'Quality',
-                    Icons.check_circle_outline,
-                    '/quality_standards',
-                  ),
-                  _buildQuickActionButton(
-                    context,
-                    'Vehicles',
-                    Icons.local_shipping,
-                    '/vehicle_registration',
-                  ),
-                  _buildQuickActionButton(
-                    context,
-                    'Drivers',
-                    Icons.person,
-                    '/driver_registration',
-                  ),
-                  _buildQuickActionButton(
-                    context,
-                    'Centers',
-                    Icons.location_on,
-                    '/collection_center',
-                  ),
-                  _buildQuickActionButton(
-                    context,
-                    'Delivery',
-                    Icons.delivery_dining,
-                    '/delivery_registration',
-                  ),
-                  _buildQuickActionButton(
-                    context,
-                    'Master',
-                    Icons.category,
-                    '/master_data',
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-
-              // Recent Analyses Section
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Flexible(
-                      child: Text(
-                        'Recent Analyses',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    TextButton.icon(
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/history');
-                      },
-                      icon: const Icon(Icons.arrow_forward, size: 18),
-                      label: const Text('View All'),
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 8),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-              recentAnalyses.isEmpty
-                  ? Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(32.0),
-                        child: Column(
-                          children: [
-                            Icon(
-                              Icons.analytics_outlined,
-                              size: 64,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurface
-                                  .withOpacity(0.3),
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              'No recent analyses available.',
-                              style: Theme.of(context).textTheme.bodyLarge,
-                            ),
-                          ],
-                        ),
-                      ),
-                    )
-                  : Column(
-                      children: recentAnalyses
-                          .map(
-                            (analysis) =>
-                                _buildAnalysisResultCard(context, analysis),
-                          )
-                          .toList(),
-                    ),
-            ],
-          ),
-        ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.pushNamed(context, '/product_master');
+        },
+        backgroundColor: colorScheme.primary,
+        foregroundColor: colorScheme.onPrimary,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: const Icon(Icons.add_rounded, size: 24),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      bottomNavigationBar: _buildBottomNavigationBar(),
     );
   }
 }

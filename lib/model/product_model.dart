@@ -61,7 +61,7 @@ class Product {
 
   Map<String, dynamic> toJson() {
     return {
-      if (productId != null) 'product_id': productId,
+      // if (productId != null) 'product_id': productId,
       'product_name': productName,
       'type': type,
       'category': category,

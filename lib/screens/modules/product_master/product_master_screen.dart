@@ -35,7 +35,15 @@ class ProductListScreen extends StatelessWidget {
                   backgroundColor: Colors.red,
                 ),
               );
-            } else if (state is ProductCreated) {
+            }else if (state is ProductUpdated) { 
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Product updated successfully'),
+                  backgroundColor: Colors.green,
+                ),
+              );
+              context.read<ProductBloc>().add(LoadProducts()); 
+            }else if (state is ProductCreated) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text('Product created successfully'),
@@ -104,6 +112,18 @@ class ProductListScreen extends StatelessWidget {
   }
 }
 
+
+  void _showEditProductDialog(BuildContext context, Product product) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => BlocProvider.value(
+        value: BlocProvider.of<ProductBloc>(context),
+        child: _EditProductDialog(product: product),
+      ),
+    );
+  }
+
+
 class _ProductListItem extends StatelessWidget {
   final Product product;
 
@@ -124,7 +144,7 @@ class _ProductListItem extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.edit),
               onPressed: () {
-                // Navigate to edit screen or show dialog
+               _showEditProductDialog(context, product);
               },
             ),
             IconButton(
@@ -177,8 +197,8 @@ class _CreateProductDialogState extends State<_CreateProductDialog> {
   final _typeController = TextEditingController();
   final _categoryController = TextEditingController();
   final _subCategoryController = TextEditingController();
-  final _statusController = TextEditingController();
   
+  String _status = 'Active';
   String _isTaxable = 'Yes';
   String _isKeepingStock = 'Yes';
   DateTime _savedIn = DateTime.now();
@@ -189,7 +209,6 @@ class _CreateProductDialogState extends State<_CreateProductDialog> {
     _typeController.dispose();
     _categoryController.dispose();
     _subCategoryController.dispose();
-    _statusController.dispose();
     super.dispose();
   }
 
@@ -209,28 +228,37 @@ class _CreateProductDialogState extends State<_CreateProductDialog> {
                 validator: (value) =>
                     value?.isEmpty ?? true ? 'Required' : null,
               ),
+              const SizedBox(height:8),
               TextFormField(
                 controller: _typeController,
                 decoration: const InputDecoration(labelText: 'Type'),
                 validator: (value) =>
                     value?.isEmpty ?? true ? 'Required' : null,
               ),
+              const SizedBox(height:8),
               TextFormField(
                 controller: _categoryController,
                 decoration: const InputDecoration(labelText: 'Category'),
                 validator: (value) =>
                     value?.isEmpty ?? true ? 'Required' : null,
               ),
+              const SizedBox(height:8),
               TextFormField(
                 controller: _subCategoryController,
                 decoration: const InputDecoration(labelText: 'Sub Category'),
               ),
-              TextFormField(
-                controller: _statusController,
+              const SizedBox(height:8),
+                DropdownButtonFormField<String>(
+                value: _status,
                 decoration: const InputDecoration(labelText: 'Status'),
-                validator: (value) =>
-                    value?.isEmpty ?? true ? 'Required' : null,
+                items: ['Active', 'Inactive']
+                    .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                    .toList(),
+                onChanged: (value) {
+                  setState(() => _status = value!);
+                },
               ),
+              const SizedBox(height:8),
               DropdownButtonFormField<String>(
                 value: _isTaxable,
                 decoration: const InputDecoration(labelText: 'Is Taxable'),
@@ -241,6 +269,7 @@ class _CreateProductDialogState extends State<_CreateProductDialog> {
                   setState(() => _isTaxable = value!);
                 },
               ),
+              const SizedBox(height:8),
               DropdownButtonFormField<String>(
                 value: _isKeepingStock,
                 decoration: const InputDecoration(labelText: 'Keeping Stock'),
@@ -271,7 +300,7 @@ class _CreateProductDialogState extends State<_CreateProductDialog> {
                 isTaxable: _isTaxable,
                 isKeepingStock: _isKeepingStock,
                 savedIn: _savedIn,
-                status: _statusController.text,
+                status: _status,
               );
               
               context.read<ProductBloc>().add(CreateProduct(product));
@@ -279,6 +308,157 @@ class _CreateProductDialogState extends State<_CreateProductDialog> {
             }
           },
           child: const Text('Create'),
+        ),
+      ],
+    );
+  }
+}
+
+class _EditProductDialog extends StatefulWidget {
+  final Product product;
+
+  const _EditProductDialog({required this.product});
+
+  @override
+  State<_EditProductDialog> createState() => _EditProductDialogState();
+}
+
+class _EditProductDialogState extends State<_EditProductDialog> {
+  final _formKey = GlobalKey<FormState>();
+  late final TextEditingController _nameController;
+  late final TextEditingController _typeController;
+  late final TextEditingController _categoryController;
+  late final TextEditingController _subCategoryController;
+  
+  late String _status;
+  late String _isTaxable;
+  late String _isKeepingStock;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize controllers with existing product data
+    _nameController = TextEditingController(text: widget.product.productName);
+    _typeController = TextEditingController(text: widget.product.type);
+    _categoryController = TextEditingController(text: widget.product.category);
+    _subCategoryController = TextEditingController(text: widget.product.subCategory);
+    
+    _status = widget.product.status;
+    _isTaxable = widget.product.isTaxable;
+    _isKeepingStock = widget.product.isKeepingStock;
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _typeController.dispose();
+    _categoryController.dispose();
+    _subCategoryController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Edit Product'),
+      content: SingleChildScrollView(
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                controller: _nameController,
+                decoration: const InputDecoration(labelText: 'Product Name'),
+                validator: (value) =>
+                    value?.isEmpty ?? true ? 'Required' : null,
+              ),
+              const SizedBox(height: 8),
+              TextFormField(
+                controller: _typeController,
+                decoration: const InputDecoration(labelText: 'Type'),
+                validator: (value) =>
+                    value?.isEmpty ?? true ? 'Required' : null,
+              ),
+              const SizedBox(height: 8),
+              TextFormField(
+                controller: _categoryController,
+                decoration: const InputDecoration(labelText: 'Category'),
+                validator: (value) =>
+                    value?.isEmpty ?? true ? 'Required' : null,
+              ),
+              const SizedBox(height: 8),
+              TextFormField(
+                controller: _subCategoryController,
+                decoration: const InputDecoration(labelText: 'Sub Category'),
+              ),
+              const SizedBox(height: 8),
+              DropdownButtonFormField<String>(
+                value: _status,
+                decoration: const InputDecoration(labelText: 'Status'),
+                items: ['Active', 'Inactive']
+                    .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                    .toList(),
+                onChanged: (value) {
+                  setState(() => _status = value!);
+                },
+              ),
+              const SizedBox(height: 8),
+              DropdownButtonFormField<String>(
+                value: _isTaxable,
+                decoration: const InputDecoration(labelText: 'Is Taxable'),
+                items: ['Yes', 'No']
+                    .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                    .toList(),
+                onChanged: (value) {
+                  setState(() => _isTaxable = value!);
+                },
+              ),
+              const SizedBox(height: 8),
+              DropdownButtonFormField<String>(
+                value: _isKeepingStock,
+                decoration: const InputDecoration(labelText: 'Keeping Stock'),
+                items: ['Yes', 'No']
+                    .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                    .toList(),
+                onChanged: (value) {
+                  setState(() => _isKeepingStock = value!);
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            if (_formKey.currentState!.validate()) {
+              final updatedProduct = Product(
+                productId: widget.product.productId,
+                productName: _nameController.text,
+                type: _typeController.text,
+                category: _categoryController.text,
+                subCategory: _subCategoryController.text,
+                isTaxable: _isTaxable,
+                isKeepingStock: _isKeepingStock,
+                savedIn: widget.product.savedIn, 
+                status: _status,
+              );
+              
+              context.read<ProductBloc>().add(
+                UpdateProduct(
+                  widget.product.productId!, 
+                  updatedProduct,
+                ),
+              );
+              Navigator.pop(context);
+            }
+          },
+          child: const Text('Update'),
         ),
       ],
     );

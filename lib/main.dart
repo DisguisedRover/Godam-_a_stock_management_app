@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:milk_content_analysis/bloc/loginBloc/login_bloc.dart';
+import 'package:milk_content_analysis/bloc/productMasterBloc/productMaster_bloc.dart';
 import 'package:milk_content_analysis/bloc/signupBloc/signup_bloc.dart';
 import 'package:milk_content_analysis/services/auth_service.dart';
 
@@ -11,7 +12,6 @@ import 'providers/master_data_provider.dart';
 import 'providers/collection_center_provider.dart';
 import 'providers/delivery_provider.dart';
 import 'providers/driver_provider.dart';
-import 'providers/product_provider.dart';
 import 'providers/theme_provider.dart';
 import 'providers/vehicle_provider.dart';
 import 'screens/authentication/login_screen.dart';
@@ -25,7 +25,7 @@ import 'screens/modules/collection_center_screen.dart';
 import 'screens/modules/delivery_entry_screen.dart';
 import 'screens/modules/driver_registration_screen.dart';
 import 'screens/modules/new_analysis_screen.dart';
-import 'screens/modules/produtc_entry_screen.dart';
+import 'screens/modules/product_master/product_master_screen.dart';
 import 'screens/modules/quality_standards_screen.dart';
 import 'screens/modules/report_screen.dart';
 import 'screens/modules/vehicle_registration_screen.dart';
@@ -46,6 +46,7 @@ void main() {
         providers: [
           BlocProvider(create: (context) => LoginBloc(authService: AuthService())),
           BlocProvider(create: (context) => SignupBloc(authService: AuthService())),
+          BlocProvider(create:(context) => ProductBloc()),
         ],
         child: const MyApp(),
       ),
@@ -89,7 +90,7 @@ class MyApp extends StatelessWidget {
             '/collection_center': (context) => const CollectionCenterScreen(),
             '/delivery_registration': (context) => const DeliveryEntryScreen(),
             '/master_data': (context) => const MasterDataScreen(),
-            '/product_entry': (context) => const ProductEntryScreen(),
+            '/product_master': (context) => const ProductListScreen(),
           },
         );
       },

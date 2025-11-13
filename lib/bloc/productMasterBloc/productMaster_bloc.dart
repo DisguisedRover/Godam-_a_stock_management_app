@@ -71,7 +71,12 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
         event.productId,
         event.product,
       );
-      emit(ProductUpdated(product));
+     if (product) {
+      final updatedProduct = await _productService.getProductById(event.productId);
+      emit(ProductUpdated(updatedProduct));
+    } else {
+      emit(const ProductError('Failed to update product'));
+    }
     } catch (e) {
       emit(ProductError(e.toString()));
     }
