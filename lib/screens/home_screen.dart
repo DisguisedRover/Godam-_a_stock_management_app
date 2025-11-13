@@ -265,7 +265,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: CircleAvatar(
             backgroundColor: colorScheme.primary.withOpacity(0.1),
             child: Image.asset(
-              appLogo,            
+            appLogo,
             ),
           ),
         ),
@@ -431,7 +431,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
-                      Icons.person_outlined,
+                      Icons.person_outline,
                       color: Colors.white,
                       size: 40,
                     ),
@@ -530,7 +530,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 100), // Space for bottom navigation
+            const SizedBox(height: 100), 
           ],
         ),
       ),
