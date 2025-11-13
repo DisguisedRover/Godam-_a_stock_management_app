@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:milk_content_analysis/bloc/bloc/login_bloc.dart/login_bloc.dart';
-import 'package:milk_content_analysis/bloc/bloc/signup_bloc/signup_bloc.dart';
+import 'package:milk_content_analysis/bloc/loginBloc/login_bloc.dart';
+import 'package:milk_content_analysis/bloc/signupBloc/signup_bloc.dart';
 import 'package:milk_content_analysis/services/auth_service.dart';
 
 import 'package:provider/provider.dart';

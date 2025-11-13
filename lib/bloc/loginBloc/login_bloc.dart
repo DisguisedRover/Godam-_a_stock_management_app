@@ -1,8 +1,8 @@
 import 'package:bloc/bloc.dart';
 
-import '../../../services/auth_service.dart';
-import '../../event/login_event/login_event.dart';
-import '../../state/login_state/login_state.dart';
+import '../../services/auth_service.dart';
+import 'login_event.dart';
+import 'login_state.dart';
 
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
   final AuthService _authService;

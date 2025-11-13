@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:milk_content_analysis/bloc/bloc/login_bloc.dart/login_bloc.dart';
-import 'package:milk_content_analysis/bloc/event/login_event/login_event.dart';
-import '../../bloc/state/login_state/login_state.dart';
+import 'package:milk_content_analysis/bloc/loginBloc/login_bloc.dart';
+import 'package:milk_content_analysis/bloc/loginBloc/login_event.dart';
+import '../../bloc/loginBloc/login_state.dart';
 import '../../constants/constants.dart';
 
 

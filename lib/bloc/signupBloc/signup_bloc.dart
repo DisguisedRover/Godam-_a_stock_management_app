@@ -1,8 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../services/auth_service.dart';
-import '../../event/signup_event/signup_event.dart';
-import '../../state/signup_state/signup_state.dart';
+import '../../services/auth_service.dart';
+import 'signup_event.dart';
+import 'signup_state.dart';
 
 class SignupBloc extends Bloc<SignupEvent, SignupState> {
   final AuthService _authService;

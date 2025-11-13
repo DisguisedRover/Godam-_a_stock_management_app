@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:milk_content_analysis/bloc/bloc/signup_bloc/signup_bloc.dart';
-import 'package:milk_content_analysis/bloc/event/signup_event/signup_event.dart';
-import 'package:milk_content_analysis/bloc/state/signup_state/signup_state.dart';
+import 'package:milk_content_analysis/bloc/signupBloc/signup_bloc.dart';
+import 'package:milk_content_analysis/bloc/signupBloc/signup_event.dart';
+import 'package:milk_content_analysis/bloc/signupBloc/signup_state.dart';
 import '../../constants/constants.dart';
 import '../../services/auth_service.dart';
 
