@@ -52,51 +52,17 @@ class _HomeScreenState extends State<HomeScreen> {
     String routeName,
   ) {
     return ListTile(
-      leading: Icon(icon),
-      title: Text(title),
+      leading: Icon(icon, size: 24),
+      title: Text(
+        title,
+        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              fontWeight: FontWeight.w500,
+            ),
+      ),
       onTap: () {
         Navigator.pop(context);
         Navigator.pushNamed(context, routeName);
       },
-    );
-  }
-
-  Widget _buildNavBarButton(
-    BuildContext context,
-    String title,
-    String routeName,
-  ) {
-    final bool isCurrentRoute =
-        ModalRoute.of(context)?.settings.name == routeName;
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: TextButton(
-        onPressed: () {
-          if (!isCurrentRoute) {
-            Navigator.pushNamed(context, routeName);
-          }
-        },
-        style: TextButton.styleFrom(
-          foregroundColor: isCurrentRoute
-              ? Theme.of(context).colorScheme.onPrimary
-              : Theme.of(context).colorScheme.primary,
-          backgroundColor: isCurrentRoute
-              ? Theme.of(context).colorScheme.primary
-              : Colors.transparent,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8.0),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-        ),
-        child: Text(
-          title,
-          style: TextStyle(
-            fontWeight: isCurrentRoute ? FontWeight.bold : FontWeight.normal,
-            fontSize: 14,
-          ),
-        ),
-      ),
     );
   }
 
@@ -107,21 +73,23 @@ class _HomeScreenState extends State<HomeScreen> {
     IconData icon,
     Color iconColor,
   ) {
-    final isMobile = MediaQuery.of(context).size.width < 600;
-
     return Card(
       elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 17.0),
+        padding: const EdgeInsets.all(16.0),
         child: Row(
           children: [
-            CircleAvatar(
-              radius: 20,
-              backgroundColor: iconColor.withOpacity(0.2),
-              child: Icon(icon, size: 20, color: iconColor),
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: iconColor.withOpacity(0.15),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, size: 24, color: iconColor),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -130,25 +98,22 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   Text(
                     title,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.w500,
-                          fontSize: 11,
                           color: Theme.of(context)
                               .textTheme
-                              .bodySmall
+                              .bodyMedium
                               ?.color
                               ?.withOpacity(0.7),
                         ),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
                   ),
+                  const SizedBox(height: 4),
                   Text(
                     value,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
+                          fontSize: 20,
                         ),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
                   ),
                 ],
               ),
@@ -165,37 +130,42 @@ class _HomeScreenState extends State<HomeScreen> {
     IconData icon,
     String routeName,
   ) {
-    final isMobile = MediaQuery.of(context).size.width < 600;
-
     return Card(
       elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
       child: InkWell(
-        borderRadius: BorderRadius.circular(12.0),
+        borderRadius: BorderRadius.circular(16.0),
         onTap: () {
           Navigator.pushNamed(context, routeName);
         },
-        child: Padding(
-          padding: const EdgeInsets.all(12.0),
+        child: Container(
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                icon,
-                size: isMobile ? 28 : 32,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              const SizedBox(height: 8),
-              Flexible(
-                child: Text(
-                  title,
-                  textAlign: TextAlign.center,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
+              Container(
+                width: 52,
+                height: 52,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                  shape: BoxShape.circle,
                 ),
+                child: Icon(
+                  icon,
+                  size: 28,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                    ),
               ),
             ],
           ),
@@ -211,9 +181,9 @@ class _HomeScreenState extends State<HomeScreen> {
     return Card(
       elevation: 2,
       margin: const EdgeInsets.only(bottom: 12.0),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
       child: InkWell(
-        borderRadius: BorderRadius.circular(12.0),
+        borderRadius: BorderRadius.circular(16.0),
         onTap: () {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Viewing details for ${analysis.id}')),
@@ -233,30 +203,30 @@ class _HomeScreenState extends State<HomeScreen> {
                       'Analysis ID: ${analysis.id}',
                       style: Theme.of(context)
                           .textTheme
-                          .titleSmall
+                          .titleMedium
                           ?.copyWith(fontWeight: FontWeight.bold),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   Icon(
                     Icons.chevron_right,
-                    size: 20,
+                    size: 24,
                     color: Theme.of(context).colorScheme.primary,
                   ),
                 ],
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 8),
               Text(
                 DateFormat('MMM dd, yyyy • HH:mm').format(analysis.date),
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Theme.of(context)
                           .textTheme
-                          .bodySmall
+                          .bodyMedium
                           ?.color
                           ?.withOpacity(0.6),
                     ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
               Wrap(
                 spacing: 8.0,
                 runSpacing: 8.0,
@@ -301,22 +271,30 @@ class _HomeScreenState extends State<HomeScreen> {
     Color color,
   ) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: color.withOpacity(0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.circle, size: 8, color: color),
-          const SizedBox(width: 6),
+          Container(
+            width: 10,
+            height: 10,
+            decoration: BoxDecoration(
+              color: color,
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 8),
           Text(
             '$label: $value',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                   color: color.withOpacity(0.9),
+                  fontSize: 13,
                 ),
           ),
         ],
@@ -333,8 +311,6 @@ class _HomeScreenState extends State<HomeScreen> {
     final double avgLactose = MockDataProvider.getAverageLactose();
 
     final themeProvider = Provider.of<ThemeProvider>(context);
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isMobile = screenWidth < 600;
 
     return Scaffold(
       appBar: AppBar(
@@ -342,32 +318,15 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: const EdgeInsets.all(8.0),
           child: CircleAvatar(
             backgroundColor: Theme.of(context).colorScheme.onPrimary,
-           child: Image.asset(
-            appLogo,
-            width: 40,
-            height: 40,
-           ),
+            child: Image.asset(
+              appLogo,
+              width: 40,
+              height: 40,
+            ),
           ),
         ),
-        title: isMobile
-            ? const Text('Godam')
-            : Row(
-                children: [
-                  _buildNavBarButton(context, 'Master', '/master'),
-                  _buildNavBarButton(context, 'Purchase', '/purchase'),
-                  _buildNavBarButton(context, 'Sales', '/sales'),
-                  _buildNavBarButton(context, 'Reports', '/reports'),
-                ],
-              ),
+        title: const Text('Godam'),
         actions: [
-          if (!isMobile)
-            IconButton(
-              icon: const Icon(Icons.notifications),
-              tooltip: 'Notifications',
-              onPressed: () {
-                Navigator.pushNamed(context, '/notifications');
-              },
-            ),
           IconButton(
             icon: Icon(
               themeProvider.themeMode == ThemeMode.dark
@@ -379,14 +338,6 @@ class _HomeScreenState extends State<HomeScreen> {
               themeProvider.toggleTheme();
             },
           ),
-          if (!isMobile)
-            IconButton(
-              icon: const Icon(Icons.settings),
-              tooltip: 'Settings',
-              onPressed: () {
-                Navigator.pushNamed(context, '/settings');
-              },
-            ),
           PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert),
             onSelected: (value) {
@@ -403,28 +354,26 @@ class _HomeScreenState extends State<HomeScreen> {
               }
             },
             itemBuilder: (context) => [
-              if (isMobile)
-                const PopupMenuItem(
-                  value: 'notifications',
-                  child: Row(
-                    children: [
-                      Icon(Icons.notifications),
-                      SizedBox(width: 12),
-                      Text('Notifications'),
-                    ],
-                  ),
+              const PopupMenuItem(
+                value: 'notifications',
+                child: Row(
+                  children: [
+                    Icon(Icons.notifications),
+                    SizedBox(width: 12),
+                    Text('Notifications'),
+                  ],
                 ),
-              if (isMobile)
-                const PopupMenuItem(
-                  value: 'settings',
-                  child: Row(
-                    children: [
-                      Icon(Icons.settings),
-                      SizedBox(width: 12),
-                      Text('Settings'),
-                    ],
-                  ),
+              ),
+              const PopupMenuItem(
+                value: 'settings',
+                child: Row(
+                  children: [
+                    Icon(Icons.settings),
+                    SizedBox(width: 12),
+                    Text('Settings'),
+                  ],
                 ),
+              ),
               const PopupMenuItem(
                 value: 'logout',
                 child: Row(
@@ -439,283 +388,303 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      drawer: isMobile
-          ? Drawer(
-              child: ListView(
-                padding: EdgeInsets.zero,
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  DrawerHeader(
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Image.asset(
-                            appLogo,
-                            width: 60,
-                            height: 60,
-                       ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Milk Analyzer',
-                          style: Theme.of(context)
-                              .textTheme
-                              .headlineSmall
-                              ?.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                        ),
-                      ],
-                    ),
+                  Image.asset(
+                    appLogo,
+                    width: 60,
+                    height: 60,
                   ),
-                  _buildDrawerItem(context, 'Master', Icons.category, '/master'),
-                  _buildDrawerItem(
-                      context, 'Purchase', Icons.shopping_cart, '/purchase'),
-                  _buildDrawerItem(
-                      context, 'Sales', Icons.point_of_sale, '/sales'),
-                  _buildDrawerItem(
-                      context, 'Reports', Icons.bar_chart, '/reports'),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Milk Analyzer',
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
                 ],
               ),
-            )
-          : null,
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Greeting Card
-            Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16.0),
-              ),
-              color: Theme.of(context).colorScheme.primary.withOpacity(0.9),
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Icon(
-                      Icons.waving_hand,
-                      size: 32,
-                      color: Theme.of(context).colorScheme.onPrimary,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      _getGreeting(),
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+            ),
+            _buildDrawerItem(context, 'Master', Icons.category, '/master'),
+            _buildDrawerItem(
+                context, 'Purchase', Icons.shopping_cart, '/purchase'),
+            _buildDrawerItem(context, 'Sales', Icons.point_of_sale, '/sales'),
+            _buildDrawerItem(context, 'Reports', Icons.bar_chart, '/reports'),
+          ],
+        ),
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Greeting Card
+              Card(
+                elevation: 4,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.9),
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.waving_hand,
+                            size: 28,
                             color: Theme.of(context).colorScheme.onPrimary,
-                            fontWeight: FontWeight.normal,
                           ),
-                    ),
-                    _isLoading
-                        ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2,
+                          const Spacer(),
+                          Icon(
+                            Icons.notifications,
+                            size: 24,
+                            color: Theme.of(context).colorScheme.onPrimary,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        _getGreeting(),
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                              color: Theme.of(context).colorScheme.onPrimary,
+                              fontWeight: FontWeight.normal,
                             ),
-                          )
-                        : Text(
-                            _userName ?? 'User',
-                            style: Theme.of(context)
-                                .textTheme
-                                .headlineMedium
-                                ?.copyWith(
-                                  color:
-                                      Theme.of(context).colorScheme.onPrimary,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                          ),
-                    const SizedBox(height: 4),
+                      ),
+                      _isLoading
+                          ? const SizedBox(
+                              height: 24,
+                              width: 24,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : Text(
+                              _userName ?? 'User',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headlineMedium
+                                  ?.copyWith(
+                                    color: Theme.of(context).colorScheme.onPrimary,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                            ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Welcome to your Godam dashboard.',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onPrimary
+                                  .withOpacity(0.9),
+                            ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // Key Metrics Section
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                child: Text(
+                  'Key Metrics Overview',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Column(
+                children: <Widget>[
+                  _buildMetricCard(
+                    context,
+                    'Average Fat Content',
+                    '${avgFat.toStringAsFixed(2)}%',
+                    Icons.opacity,
+                    Colors.orange.shade700,
+                  ),
+                  const SizedBox(height: 12),
+                  _buildMetricCard(
+                    context,
+                    'Average Protein Content',
+                    '${avgProtein.toStringAsFixed(2)}%',
+                    Icons.egg,
+                    Colors.green.shade700,
+                  ),
+                  const SizedBox(height: 12),
+                  _buildMetricCard(
+                    context,
+                    'Average Lactose Content',
+                    '${avgLactose.toStringAsFixed(2)}%',
+                    Icons.water_drop,
+                    Colors.blue.shade700,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+
+              // Quick Actions Section
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
                     Text(
-                      'Welcome to your Godam dashboard.',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onPrimary
-                                .withOpacity(0.9),
+                      'Quick Actions',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
                           ),
                     ),
                   ],
                 ),
               ),
-            ),
-            const SizedBox(height: 24),
-
-            // Key Metrics Section
-            Text(
-              'Key Metrics Overview',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
+              const SizedBox(height: 16),
+              GridView.count(
+                crossAxisCount: 3,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                childAspectRatio: 0.85,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
+                children: <Widget>[
+                  _buildQuickActionButton(
+                    context,
+                    'New Analysis',
+                    Icons.add_chart,
+                    '/new_analysis',
                   ),
-            ),
-            const SizedBox(height: 12),
-            GridView.count(
-              crossAxisCount: isMobile ? 1 : 3,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              childAspectRatio: isMobile ? 6.5 : 1.8,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-              children: <Widget>[
-              
-            
-                _buildMetricCard(
-                  context,
-                  'Avg. Fat',
-                  '${avgFat.toStringAsFixed(2)}%',
-                  Icons.opacity,
-                  Colors.orange.shade700,
-                ),
-                _buildMetricCard(
-                  context,
-                  'Avg. Protein',
-                  '${avgProtein.toStringAsFixed(2)}%',
-                  Icons.egg,
-                  Colors.green.shade700,
-                ),
-                _buildMetricCard(
-                  context,
-                  'Avg. Lactose',
-                  '${avgLactose.toStringAsFixed(2)}%',
-                  Icons.water_drop,
-                  Colors.blue.shade700,
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-
-            // Quick Actions Section
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Quick Actions',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            GridView.count(
-              crossAxisCount: isMobile ? 3 : 4,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              childAspectRatio: isMobile ? 0.9 : 1.2,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
-              children: <Widget>[
-                _buildQuickActionButton(
-                  context,
-                  'New Analysis',
-                  Icons.add_chart,
-                  '/new_analysis',
-                ),
-                _buildQuickActionButton(
-                  context,
-                  'History',
-                  Icons.history,
-                  '/history',
-                ),
-                _buildQuickActionButton(
-                  context,
-                  'Reports',
-                  Icons.bar_chart,
-                  '/reports',
-                ),
-                _buildQuickActionButton(
-                  context,
-                  'Quality',
-                  Icons.check_circle_outline,
-                  '/quality_standards',
-                ),
-                _buildQuickActionButton(
-                  context,
-                  'Vehicles',
-                  Icons.local_shipping,
-                  '/vehicle_registration',
-                ),
-                _buildQuickActionButton(
-                  context,
-                  'Drivers',
-                  Icons.person,
-                  '/driver_registration',
-                ),
-                _buildQuickActionButton(
-                  context,
-                  'Centers',
-                  Icons.location_on,
-                  '/collection_center',
-                ),
-                _buildQuickActionButton(
-                  context,
-                  'Delivery',
-                  Icons.delivery_dining,
-                  '/delivery_registration',
-                ),
-                _buildQuickActionButton(
-                  context,
-                  'Master',
-                  Icons.category,
-                  '/master_data',
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-
-            // Recent Analyses Section
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Flexible(
-                  child: Text(
-                    'Recent Analyses',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                    overflow: TextOverflow.ellipsis,
+                  _buildQuickActionButton(
+                    context,
+                    'History',
+                    Icons.history,
+                    '/history',
                   ),
-                ),
-                TextButton.icon(
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/history');
-                  },
-                  icon: const Icon(Icons.arrow_forward, size: 18),
-                  label: const Text('View All'),
-                  style: TextButton.styleFrom(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  _buildQuickActionButton(
+                    context,
+                    'Reports',
+                    Icons.bar_chart,
+                    '/reports',
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            recentAnalyses.isEmpty
-                ? Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(20.0),
+                  _buildQuickActionButton(
+                    context,
+                    'Quality',
+                    Icons.check_circle_outline,
+                    '/quality_standards',
+                  ),
+                  _buildQuickActionButton(
+                    context,
+                    'Vehicles',
+                    Icons.local_shipping,
+                    '/vehicle_registration',
+                  ),
+                  _buildQuickActionButton(
+                    context,
+                    'Drivers',
+                    Icons.person,
+                    '/driver_registration',
+                  ),
+                  _buildQuickActionButton(
+                    context,
+                    'Centers',
+                    Icons.location_on,
+                    '/collection_center',
+                  ),
+                  _buildQuickActionButton(
+                    context,
+                    'Delivery',
+                    Icons.delivery_dining,
+                    '/delivery_registration',
+                  ),
+                  _buildQuickActionButton(
+                    context,
+                    'Master',
+                    Icons.category,
+                    '/master_data',
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+
+              // Recent Analyses Section
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Flexible(
                       child: Text(
-                        'No recent analyses available.',
-                        style: Theme.of(context).textTheme.bodyLarge,
+                        'Recent Analyses',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                  )
-                : Column(
-                    children: recentAnalyses
-                        .map(
-                          (analysis) =>
-                              _buildAnalysisResultCard(context, analysis),
-                        )
-                        .toList(),
-                  ),
-          ],
+                    TextButton.icon(
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/history');
+                      },
+                      icon: const Icon(Icons.arrow_forward, size: 18),
+                      label: const Text('View All'),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 8),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              recentAnalyses.isEmpty
+                  ? Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(32.0),
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.analytics_outlined,
+                              size: 64,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withOpacity(0.3),
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              'No recent analyses available.',
+                              style: Theme.of(context).textTheme.bodyLarge,
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  : Column(
+                      children: recentAnalyses
+                          .map(
+                            (analysis) =>
+                                _buildAnalysisResultCard(context, analysis),
+                          )
+                          .toList(),
+                    ),
+            ],
+          ),
         ),
       ),
     );

@@ -1,8 +1,6 @@
 String httpScheme = 'https';
-String API_URL = '5tb7hl9j-3000.inc1.devtunnels.ms';
+String API_URL = 'cba705cf81c1.ngrok-free.app';
 int? portNo = null;
-
-// https://5tb7hl9j-3000.inc1.devtunnels.ms/
 
 
 String appLogo = 'assets/images/appLogo.png';
@@ -16,8 +14,10 @@ String editUserName = '/auth/editUserName';
 // product
 String saveProduct = '/product/saveProduct';
 String editProduct = '/product/editProduct';
-String deleteProduct = '/product/deleteProduct';
+String deleteproduct = '/product/deleteProduct';
 String getProduct = '/product/getAllProduct';
+String getProductbyId = '/product/getProductById';
+
 
 // product detail
 String saveProductDetail = '/product/saveProductDetail';

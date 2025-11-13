@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  static const Color primaryRetroModern = Color(0xFF00796B); // Deep Teal
-  static const Color accentRetroModern = Color(0xFFFFC107); // Amber
+  static const Color primaryRetroModern = Color(0xFF00796B); 
+  static const Color accentRetroModern = Color(0xFFFFC107); 
 
   static const Color lightScaffoldBackground = Color(0xFFEFEFEF);
   static const Color lightCardBackground = Colors.white;

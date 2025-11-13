@@ -109,14 +109,14 @@ class _LoginScreenState extends State<LoginScreen> {
                               controller: _usernameController,
                               focusNode: _usernameFocusNode,
                               decoration: const InputDecoration(
-                                labelText: 'Username',
-                                hintText: 'Enter your username',
+                                labelText: 'Username or Email',
+                                hintText: 'Enter your username or email',
                                 prefixIcon: Icon(Icons.person_2),
                               ),
                               keyboardType: TextInputType.emailAddress,
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Please enter your usermane';
+                                  return 'Please enter your usermane or email';
                                 }
                                 // if (!RegExp(
                                 //   r'^[^@]+@[^@]+\.[^@]+',
@@ -166,6 +166,21 @@ class _LoginScreenState extends State<LoginScreen> {
                                 _login();
                               },
                             ),
+                            const SizedBox(height: 10),
+                            Column(
+                              children: [
+                                state is LoginLoading
+                                    ? const CircularProgressIndicator()
+                                    : SizedBox(
+                                        width: double.infinity,
+                                        child: ElevatedButton(
+                                          onPressed: _login,
+                                          child: const Text('Login'),
+                                        ),
+                                    )
+                              ]
+                            ),
+
                             const SizedBox(height: 10),
                             Align(
                               alignment: Alignment.centerLeft,

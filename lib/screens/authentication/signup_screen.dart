@@ -255,6 +255,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               _validateAndSignUp();
                             },
                           ),
+                          const SizedBox(height: 10),
+                          Column(
+                            children: [
+                              state is SignupLoading
+                                  ? const CircularProgressIndicator()
+                                  : SizedBox(
+                                    width: double.infinity,
+                                    child: ElevatedButton(
+                                        onPressed: _validateAndSignUp,
+                                        child: const Text('Sign Up'),
+                                    )
+                                  )
+                            ],
+                          ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [

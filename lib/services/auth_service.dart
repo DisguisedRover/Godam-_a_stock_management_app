@@ -6,19 +6,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../constants/constants.dart';
 
 class AuthService {
-  // Shared preferences keys
   static const String _tokenKey = 'auth_token';
   static const String _userIdKey = 'user_id';
   static const String _userNameKey = 'user_name';
   static const String _userEmailKey = 'user_email';
 
-  // // Build base URL
-  // String get baseUrl {
-  //   final uri = Uri(scheme: httpScheme, host: API_URL, port: portNo);
-  //   return uri.toString();
-  // }
-
-  // Login method - now accepts identifier (email or username) and password
   Future<Map<String, dynamic>?> login(
     String identifier,
     String password,
@@ -65,7 +57,6 @@ class AuthService {
     }
   }
 
-  // Signup method - matches controller parameters
   Future<Map<String, dynamic>?> signup(
     String userName,
     String email,
@@ -195,7 +186,6 @@ class AuthService {
     }
   }
 
-  // Save authentication data to SharedPreferences
   Future<void> _saveAuthData(
     String token,
     String userId,
@@ -209,37 +199,31 @@ class AuthService {
     await prefs.setString(_userEmailKey, email);
   }
 
-  // Get stored token
   Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString(_tokenKey);
   }
 
-  // Get stored user ID
   Future<String?> getUserId() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString(_userIdKey);
   }
 
-  // Get stored user name
   Future<String?> getUserName() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString(_userNameKey);
   }
 
-  // Get stored user email
   Future<String?> getUserEmail() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString(_userEmailKey);
   }
 
-  // Check if user is logged in
   Future<bool> isLoggedIn() async {
     final token = await getToken();
     return token != null && token.isNotEmpty;
   }
 
-  // Logout method
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_tokenKey);
@@ -248,7 +232,6 @@ class AuthService {
     await prefs.remove(_userEmailKey);
   }
 
-  // Get authorization headers for API calls
   Future<Map<String, String>> getAuthHeaders() async {
     final token = await getToken();
     return {
@@ -257,7 +240,6 @@ class AuthService {
     };
   }
 
-  // user name update
   Future<void> _updateUserName(String newUserName) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_userNameKey, newUserName);
