@@ -25,7 +25,7 @@ import 'screens/modules/collection_center_screen.dart';
 import 'screens/modules/delivery_entry_screen.dart';
 import 'screens/modules/driver_registration_screen.dart';
 import 'screens/modules/new_analysis_screen.dart';
-import 'screens/modules/product_master/product_master_screen.dart';
+import 'screens/modules/product/product_master_screen.dart';
 import 'screens/modules/quality_standards_screen.dart';
 import 'screens/modules/report_screen.dart';
 import 'screens/modules/vehicle_registration_screen.dart';

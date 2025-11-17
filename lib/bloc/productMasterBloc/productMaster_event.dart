@@ -8,10 +8,8 @@ abstract class ProductEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-// Load all products
 class LoadProducts extends ProductEvent {}
 
-// Load a single product by ID
 class LoadProductById extends ProductEvent {
   final int productId;
 
@@ -21,7 +19,6 @@ class LoadProductById extends ProductEvent {
   List<Object?> get props => [productId];
 }
 
-// Create a new product
 class CreateProduct extends ProductEvent {
   final Product product;
 
@@ -31,7 +28,6 @@ class CreateProduct extends ProductEvent {
   List<Object?> get props => [product];
 }
 
-// Update an existing product
 class UpdateProduct extends ProductEvent {
   final int productId;
   final Product product;
@@ -42,7 +38,6 @@ class UpdateProduct extends ProductEvent {
   List<Object?> get props => [productId, product];
 }
 
-// Delete a product
 class DeleteProduct extends ProductEvent {
   final int productId;
 
@@ -52,7 +47,6 @@ class DeleteProduct extends ProductEvent {
   List<Object?> get props => [productId];
 }
 
-// Search/Filter products
 class SearchProducts extends ProductEvent {
   final String? category;
   final String? type;

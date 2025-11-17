@@ -157,7 +157,6 @@ class ProductService {
       final data = jsonDecode(response.body);
       debugPrint("Update product response: $data");
 
-      // Check if the message indicates success
       final message = data['message']?.toString().toLowerCase() ?? '';
       return message.contains('success') || message.contains('updated');
     } else if (response.statusCode == 400) {

@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../services/product_master/product_master_http.dart';
+import '../../services/product/product_master_http.dart';
 import 'productMaster_event.dart';
 import 'productMaster_state.dart';
 
@@ -18,7 +18,6 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     on<SearchProducts>(_onSearchProducts);
   }
 
-  // Load all products
   Future<void> _onLoadProducts(
     LoadProducts event,
     Emitter<ProductState> emit,
@@ -32,7 +31,6 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     }
   }
 
-  // Load a single product by ID
   Future<void> _onLoadProductById(
     LoadProductById event,
     Emitter<ProductState> emit,
@@ -46,7 +44,6 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     }
   }
 
-  // Create a new product
   Future<void> _onCreateProduct(
     CreateProduct event,
     Emitter<ProductState> emit,
@@ -60,7 +57,6 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     }
   }
 
-  // Update an existing product
   Future<void> _onUpdateProduct(
     UpdateProduct event,
     Emitter<ProductState> emit,
@@ -82,7 +78,6 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     }
   }
 
-  // Delete a product
   Future<void> _onDeleteProduct(
     DeleteProduct event,
     Emitter<ProductState> emit,
@@ -100,7 +95,6 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     }
   }
 
-  // Search/Filter products
   Future<void> _onSearchProducts(
     SearchProducts event,
     Emitter<ProductState> emit,

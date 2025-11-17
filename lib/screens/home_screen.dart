@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:milk_content_analysis/constants/constants.dart';
 import 'package:provider/provider.dart';
 
+import '../constants/constants.dart';
 import '../providers/theme_provider.dart';
 import '../services/auth_service.dart';
+import '../theme/app_theme.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -21,7 +22,9 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _loadUserName();
+    if (_userName == null) {
+      _loadUserName();
+    }
   }
 
   Future<void> _loadUserName() async {
@@ -62,54 +65,48 @@ class _HomeScreenState extends State<HomeScreen> {
     IconData icon,
     Color color,
   ) {
-    return Container(
-      width: 160,
-      child: Card(
-        elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-          side: BorderSide(
-            color: Theme.of(context).dividerColor.withOpacity(0.1),
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: color.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(icon, color: color, size: 24),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Card(
+      elevation: 5,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Container(
+        width: 160,
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(8),
               ),
-              const SizedBox(height: 16),
-              Text(
-                value,
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                title,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-                    ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                subtitle,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
-                    ),
-              ),
-            ],
-          ),
+              child: Icon(icon, color: color, size: 20),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              value,
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).textTheme.bodyMedium?.color,
+                  ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              title,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: isDark ? Colors.grey[400] : Colors.grey[600],
+                  ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              subtitle,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: isDark ? Colors.grey[500] : Colors.grey[500],
+                  ),
+            ),
+          ],
         ),
       ),
     );
@@ -124,28 +121,23 @@ class _HomeScreenState extends State<HomeScreen> {
     VoidCallback onTap,
   ) {
     return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-        side: BorderSide(
-          color: Theme.of(context).dividerColor.withOpacity(0.1),
-        ),
-      ),
+      elevation: 5,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(12),
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(16),
           child: Row(
             children: [
               Container(
-                width: 60,
-                height: 60,
+                width: 50,
+                height: 50,
                 decoration: BoxDecoration(
                   color: color.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(icon, color: color, size: 28),
+                child: Icon(icon, color: color, size: 24),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -156,14 +148,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       title,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w600,
-                            color: Theme.of(context).colorScheme.onSurface,
+                            color: Theme.of(context).textTheme.bodyMedium?.color,
                           ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       description,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
                           ),
                     ),
                   ],
@@ -172,7 +164,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Icon(
                 Icons.arrow_forward_ios_rounded,
                 size: 16,
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+                color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.5),
               ),
             ],
           ),
@@ -181,272 +173,170 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildBottomNavigationBar() {
-    return Container(
-      margin: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(25),
-        color: Theme.of(context).colorScheme.surface,
-        boxShadow: [
-          BoxShadow(
-            blurRadius: 20,
-            color: Colors.black.withOpacity(0.1),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(8),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _buildNavItem(Icons.home_rounded, 'Home', 0),
-            _buildNavItem(Icons.category_rounded, 'Products', 1),
-            _buildNavItem(Icons.analytics_rounded, 'Reports', 2),
-            _buildNavItem(Icons.person_rounded, 'Profile', 3),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNavItem(IconData icon, String label, int index) {
-    return GestureDetector(
-      onTap: () {
+  Widget _buildStandardBottomNavigationBar() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return BottomNavigationBar(
+      currentIndex: _currentIndex,
+      onTap: (index) {
         setState(() {
           _currentIndex = index;
         });
       },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          color: _currentIndex == index
-              ? Theme.of(context).colorScheme.primary.withOpacity(0.1)
-              : Colors.transparent,
-        ),
-        child: Column(
+      elevation: 5,
+      backgroundColor: isDark ? AppTheme.darkCardBackground : Colors.white,
+      type: BottomNavigationBarType.fixed,
+      selectedItemColor: AppTheme.primaryRetroModern,
+      unselectedItemColor: isDark ? Colors.grey[400] : Colors.grey[600],
+      showSelectedLabels: false,
+      showUnselectedLabels: false,
+      items: const [
+        BottomNavigationBarItem(icon: Icon(Icons.home_rounded), label: 'Home'),
+        BottomNavigationBarItem(icon: Icon(Icons.category_rounded), label: 'Products'),
+        BottomNavigationBarItem(icon: Icon(Icons.analytics_rounded), label: 'Reports'),
+        BottomNavigationBarItem(icon: Icon(Icons.person_rounded), label: 'Profile'),
+      ],
+    );
+  }
+
+  void _showProfileMenu() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: isDark ? AppTheme.darkCardBackground : Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+      ),
+      builder: (context) {
+        return Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon,
-              size: 24,
-              color: _currentIndex == index
-                  ? Theme.of(context).colorScheme.primary
-                  : Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            Padding(
+              padding: const EdgeInsets.only(top: 16.0),
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.grey[600] : Colors.grey[400],
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
             ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: _currentIndex == index
-                        ? Theme.of(context).colorScheme.primary
-                        : Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
-                    fontWeight: _currentIndex == index ? FontWeight.w600 : FontWeight.normal,
-                  ),
+            ListTile(
+              leading: Icon(Icons.settings_rounded, color: AppTheme.primaryRetroModern),
+              title: Text('Settings', style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color)),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/settings');
+              },
             ),
+            ListTile(
+              leading: Icon(Icons.brightness_6_rounded, color: AppTheme.primaryRetroModern),
+              title: Text(
+                Provider.of<ThemeProvider>(context).themeMode == ThemeMode.dark
+                    ? 'Switch to Light Mode'
+                    : 'Switch to Dark Mode',
+                style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color),
+              ),
+              onTap: () {
+                Provider.of<ThemeProvider>(context, listen: false).toggleTheme();
+                Navigator.pop(context); 
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.logout_rounded, color: Colors.red),
+              title: Text('Logout', style: const TextStyle(color: Colors.red)),
+              onTap: () {
+                Navigator.pop(context); 
+                _authService.logout();
+                Navigator.pushReplacementNamed(context, '/'); 
+              },
+            ),
+            const SizedBox(height: 20),
           ],
-        ),
-      ),
+        );
+      },
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
-    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: colorScheme.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
+        titleSpacing: 0,
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+        elevation: 5,
         leading: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.only(left: 16.0),
           child: CircleAvatar(
-            backgroundColor: colorScheme.primary.withOpacity(0.1),
-            child: Image.asset(
-            appLogo,
+            backgroundColor: AppTheme.primaryRetroModern.withOpacity(0.1),
+            child: ClipOval(
+              child: Image.asset(
+                appLogo,
+                fit: BoxFit.cover,
+              ),
             ),
           ),
         ),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Godam',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: colorScheme.onBackground,
-                  ),
-            ),
-            Text(
-              'Stock Management',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onBackground.withOpacity(0.6),
-                  ),
-            ),
-          ],
+        title: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Godam',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).textTheme.bodyMedium?.color,
+                    ),
+              ),
+              Text(
+                'Management your stock',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).textTheme.bodySmall?.color,
+                    ),
+              ),
+            ],
+          ),
         ),
         actions: [
           IconButton(
-            icon: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: colorScheme.primary.withOpacity(0.1),
-              ),
-              child: Icon(
-                themeProvider.themeMode == ThemeMode.dark
-                    ? Icons.light_mode_rounded
-                    : Icons.dark_mode_rounded,
-                size: 20,
-                color: colorScheme.primary,
-              ),
+            icon: CircleAvatar(
+              radius: 18,
+              backgroundColor: AppTheme.primaryRetroModern,
+              child: _isLoading
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                    )
+                  : Icon(
+                      Icons.person_rounded,
+                      size: 20,
+                      color: Colors.white,
+                    ),
             ),
-            onPressed: () {
-              themeProvider.toggleTheme();
-            },
-          ),
-          PopupMenuButton<String>(
-            icon: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: colorScheme.primary.withOpacity(0.1),
-              ),
-              child: Icon(
-                Icons.more_vert_rounded,
-                size: 20,
-                color: colorScheme.primary,
-              ),
-            ),
-            onSelected: (value) {
-              switch (value) {
-                case 'settings':
-                  Navigator.pushNamed(context, '/settings');
-                  break;
-                case 'logout':
-                  Navigator.pushReplacementNamed(context, '/');
-                  break;
-              }
-            },
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                value: 'settings',
-                child: Row(
-                  children: [
-                    Icon(Icons.settings_rounded, color: colorScheme.onSurface),
-                    const SizedBox(width: 12),
-                    Text('Settings'),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: 'logout',
-                child: Row(
-                  children: [
-                    Icon(Icons.logout_rounded, color: colorScheme.onSurface),
-                    const SizedBox(width: 12),
-                    Text('Logout'),
-                  ],
-                ),
-              ),
-            ],
+            onPressed: _showProfileMenu,
+            tooltip: 'Profile & Actions',
           ),
           const SizedBox(width: 8),
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header Section
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    colorScheme.primary.withOpacity(0.8),
-                    colorScheme.primary,
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(24),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Text(
-                              _getGreetingEmoji(),
-                              style: const TextStyle(fontSize: 24),
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              _getGreeting(),
-                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    color: Colors.white.withOpacity(0.9),
-                                  ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        _isLoading
-                            ? Container(
-                                height: 24,
-                                width: 120,
-                                child: LinearProgressIndicator(
-                                  backgroundColor: Colors.white.withOpacity(0.3),
-                                  color: Colors.white,
-                                ),
-                              )
-                            : Text(
-                                _userName ?? 'User',
-                                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                              ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Ready to manage your inventory?',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: Colors.white.withOpacity(0.8),
-                              ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    width: 80,
-                    height: 80,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.person_outline,
-                      color: Colors.white,
-                      size: 40,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            _buildGreetingHeader(context),
             const SizedBox(height: 32),
-
-            // Quick Stats Section
             Text(
               'Quick Stats',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: colorScheme.onBackground,
+                    color: Theme.of(context).textTheme.bodyMedium?.color,
                   ),
             ),
             const SizedBox(height: 16),
@@ -469,7 +359,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     '8',
                     'Active',
                     Icons.category_rounded,
-                    Colors.green,
+                    AppTheme.primaryRetroModern,
                   ),
                   const SizedBox(width: 12),
                   _buildMetricCard(
@@ -484,13 +374,11 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const SizedBox(height: 32),
-
-            // Features Section
             Text(
               'Features',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: colorScheme.onBackground,
+                    color: Theme.of(context).textTheme.bodyMedium?.color,
                   ),
             ),
             const SizedBox(height: 16),
@@ -501,7 +389,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   'Product Master',
                   'Manage your product catalog and inventory',
                   Icons.category_rounded,
-                  Colors.purple,
+                  AppTheme.primaryRetroModern,
                   () {
                     Navigator.pushNamed(context, '/product_master');
                   },
@@ -511,7 +399,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   context,
                   'Stock Management',
                   'Track inventory levels and movements',
-                  Icons.analytics_rounded,
+                  Icons.inventory_2_rounded,
                   Colors.blue,
                   () {
                     // Navigate to stock management
@@ -530,7 +418,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 100), 
+            const SizedBox(height: 100),
           ],
         ),
       ),
@@ -538,13 +426,101 @@ class _HomeScreenState extends State<HomeScreen> {
         onPressed: () {
           Navigator.pushNamed(context, '/product_master');
         },
-        backgroundColor: colorScheme.primary,
-        foregroundColor: colorScheme.onPrimary,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: const Icon(Icons.add_rounded, size: 24),
+        backgroundColor: AppTheme.primaryRetroModern,
+        foregroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        child: const Icon(Icons.add_rounded, size: 28),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: _buildBottomNavigationBar(),
+      bottomNavigationBar: _buildStandardBottomNavigationBar(),
+    );
+  }
+
+  Widget _buildGreetingHeader(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    return Card(
+      elevation: 5,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              AppTheme.primaryRetroModern.withOpacity(0.9),
+              AppTheme.primaryRetroModern,
+            ],
+          ),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        _getGreetingEmoji(),
+                        style: const TextStyle(fontSize: 24),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        _getGreeting(),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  _isLoading
+                      ? SizedBox(
+                          height: 24,
+                          width: 120,
+                          child: LinearProgressIndicator(
+                            backgroundColor: Colors.white.withOpacity(0.3),
+                            color: Colors.white,
+                          ),
+                        )
+                      : Text(
+                          _userName ?? 'User',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Ready to manage your inventory?',
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.9),
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 16),
+            CircleAvatar(
+              radius: 35,
+              backgroundColor: Colors.white.withOpacity(0.2),
+              child: Icon(
+                Icons.warehouse_rounded,
+                color: Colors.white,
+                size: 40,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

@@ -8,13 +8,10 @@ abstract class ProductState extends Equatable {
   List<Object?> get props => [];
 }
 
-// Initial state
 class ProductInitial extends ProductState {}
 
-// Loading state
 class ProductLoading extends ProductState {}
 
-// Products loaded successfully
 class ProductsLoaded extends ProductState {
   final List<Product> products;
 
@@ -24,7 +21,6 @@ class ProductsLoaded extends ProductState {
   List<Object?> get props => [products];
 }
 
-// Single product loaded successfully
 class ProductLoaded extends ProductState {
   final Product product;
 
@@ -34,7 +30,6 @@ class ProductLoaded extends ProductState {
   List<Object?> get props => [product];
 }
 
-// Product created successfully
 class ProductCreated extends ProductState {
   final Product product;
 
@@ -44,7 +39,6 @@ class ProductCreated extends ProductState {
   List<Object?> get props => [product];
 }
 
-// Product updated successfully
 class ProductUpdated extends ProductState {
   final Product product;
 
@@ -54,7 +48,6 @@ class ProductUpdated extends ProductState {
   List<Object?> get props => [product];
 }
 
-// Product deleted successfully
 class ProductDeleted extends ProductState {
   final int productId;
 
@@ -64,7 +57,6 @@ class ProductDeleted extends ProductState {
   List<Object?> get props => [productId];
 }
 
-// Error state
 class ProductError extends ProductState {
   final String message;
 
