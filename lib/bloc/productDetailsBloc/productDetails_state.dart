@@ -22,14 +22,15 @@ class ProductDetailsLoaded extends ProductDetailsState{
   List<Object?> get props => [productDetails];
 }
 
-class ProdcutDetailLoaded extends ProductDetailsState{
+class ProductDetailLoaded extends ProductDetailsState{
   final ProductDetails productDetails;
 
-  const ProdcutDetailLoaded(this.productDetails);
+  const ProductDetailLoaded(this.productDetails);
 
   @override
   List<Object?> get props => [productDetails];
 }
+
 
 class ProductDetailsCreated extends ProductDetailsState {
   final ProductDetails productDetails;

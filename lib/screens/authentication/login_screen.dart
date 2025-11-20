@@ -4,7 +4,7 @@ import 'package:milk_content_analysis/bloc/loginBloc/login_bloc.dart';
 import 'package:milk_content_analysis/bloc/loginBloc/login_event.dart';
 import '../../bloc/loginBloc/login_state.dart';
 import '../../constants/constants.dart';
-
+import '../../services/auth/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -15,17 +15,31 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  // final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-
-  // final FocusNode _emailFocusNode = FocusNode();
   final FocusNode _passwordFocusNode = FocusNode();
+  final TextEditingController _usernameController = TextEditingController();
+  final FocusNode _usernameFocusNode = FocusNode();
 
   bool _passwordVisible = false;
-  final TextEditingController _usernameController = TextEditingController();
-  // Focus nodes to manage keyboard focus
+  bool _rememberMe = false;
+  final AuthService _authService = AuthService();
 
-  final FocusNode _usernameFocusNode = FocusNode();
+  @override
+  void initState() {
+    super.initState();
+    _loadRememberedCredentials();
+  }
+
+  void _loadRememberedCredentials() async {
+    final credentials = await _authService.getRememberedCredentials();
+    if (credentials != null) {
+      setState(() {
+        _usernameController.text = credentials['identifier']!;
+        _passwordController.text = credentials['password']!;
+        _rememberMe = true;
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -38,6 +52,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _login() async {
     if (_formKey.currentState!.validate()) {
+      if (_rememberMe) {
+        await _authService.saveRememberMeCredentials(
+          _usernameController.text,
+          _passwordController.text,              
+        );
+      } else {
+        await _authService.clearRememberMeCredentials();
+      }
+
       BlocProvider.of<LoginBloc>(context).add(
         LoginButtonPressed(
           username: _usernameController.text,
@@ -69,30 +92,21 @@ class _LoginScreenState extends State<LoginScreen> {
                       if (state is LoginSuccess) {
                         Navigator.pushReplacementNamed(context, '/home');
                       } else if (state is LoginFailure) {
-                        ScaffoldMessenger.of(
-                          context,
-                        ).showSnackBar(SnackBar(content: Text(state.error)));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(state.error)),
+                        );
                       }
                     },
-
                     child: BlocBuilder<LoginBloc, LoginState>(
                       builder: (context, state) {
                         return Column(
                           mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
-                            // CircleAvatar(
-                            //   radius: 50,
-                            //   backgroundColor: Theme.of(
-                            //     context,
-                            //   ).colorScheme.primary,
-                            //   child: 
-                              Image.asset(
-                                appLogo,
-                                width: 60,
-                                height: 60,
-                                // color: Theme.of(context).colorScheme.onPrimary,
-                              ),
-                            // ),
+                            Image.asset(
+                              appLogo,
+                              width: 60,
+                              height: 60,
+                            ),
                             const SizedBox(height: 20),
                             Text(
                               'Welcome Back!',
@@ -116,19 +130,12 @@ class _LoginScreenState extends State<LoginScreen> {
                               keyboardType: TextInputType.emailAddress,
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Please enter your usermane or email';
+                                  return 'Please enter your username or email';
                                 }
-                                // if (!RegExp(
-                                //   r'^[^@]+@[^@]+\.[^@]+',
-                                // ).hasMatch(value)) {
-                                //   return 'Please enter a valid email address';
-                                // }
                                 return null;
                               },
                               onFieldSubmitted: (_) {
-                                FocusScope.of(
-                                  context,
-                                ).requestFocus(_passwordFocusNode);
+                                FocusScope.of(context).requestFocus(_passwordFocusNode);
                               },
                             ),
                             const SizedBox(height: 20),
@@ -144,9 +151,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     _passwordVisible
                                         ? Icons.visibility
                                         : Icons.visibility_off,
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.primary,
+                                    color: Theme.of(context).colorScheme.primary,
                                   ),
                                   onPressed: () {
                                     setState(() {
@@ -167,6 +172,82 @@ class _LoginScreenState extends State<LoginScreen> {
                               },
                             ),
                             const SizedBox(height: 10),
+                            
+                            LayoutBuilder(
+                              builder: (context, constraints) {
+                                return constraints.maxWidth > 300
+                                    ? Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Expanded(
+                                            child: Row(
+                                              children: [
+                                                Checkbox(
+                                                  value: _rememberMe,
+                                                  onChanged: (bool? value) {
+                                                    setState(() {
+                                                      _rememberMe = value ?? false;
+                                                    });
+                                                  },
+                                                ),
+                                                const Text('Remember Me'),
+                                              ],
+                                            ),
+                                          ),
+                                          
+                                          TextButton(
+                                            onPressed: () {
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                const SnackBar(
+                                                  content: Text(
+                                                    'Forgot password functionality not implemented yet.',
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                            child: const Text('Forgot Password?'),
+                                          ),
+                                        ],
+                                      )
+                                    : Column(
+                                        children: [
+                                          // Remember Me
+                                          Row(
+                                            children: [
+                                              Checkbox(
+                                                value: _rememberMe,
+                                                onChanged: (bool? value) {
+                                                  setState(() {
+                                                    _rememberMe = value ?? false;
+                                                  });
+                                                },
+                                              ),
+                                              const Text('Remember Me'),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 8),
+                                          // Forgot Password
+                                          Align(
+                                            alignment: Alignment.centerRight,
+                                            child: TextButton(
+                                              onPressed: () {
+                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                  const SnackBar(
+                                                    content: Text(
+                                                      'Forgot password functionality not implemented yet.',
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                              child: const Text('Forgot Password?'),
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                              },
+                            ),
+
+                            const SizedBox(height: 10),
                             Column(
                               children: [
                                 state is LoginLoading
@@ -177,27 +258,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                           onPressed: _login,
                                           child: const Text('Login'),
                                         ),
-                                    )
+                                      )
                               ]
                             ),
-
-                            const SizedBox(height: 10),
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: TextButton(
-                                onPressed: () {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text(
-                                        'Forgot password functionality not implemented yet.',
-                                      ),
-                                    ),
-                                  );
-                                },
-                                child: const Text('Forgot Password?'),
-                              ),
-                            ),
-
                             const SizedBox(height: 12),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,

@@ -1,11 +1,11 @@
-
 import 'dart:convert';
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 
 import '../../constants/constants.dart';
 import '../../model/product_model.dart';
-import '../auth_service.dart';
+import '../../utils/api_helper.dart';
+import '../auth/auth_service.dart';
 
 class ProductService {
   final AuthService _authService = AuthService();
@@ -31,19 +31,29 @@ class ProductService {
         debugPrint("Get products response: $data");
 
         if (data is List){
-
           return data.map((json) => Product.fromJson(json)).toList();
         }else if (data['success'] == true) {
           final List<dynamic> productsJson = data['products'];
           return productsJson.map((json) => Product.fromJson(json)).toList();
         }else if (data is Map && data.containsKey('products')){
-
           final List<dynamic> productJson = data['products'];
           return productJson.map((json) => Product.fromJson(json)).toList();
         }
          else {
           throw Exception(data['message'] ?? 'Failed to load products');
         }
+      } else if (response.statusCode == 404) {
+        throw Exception('Products not found');
+      } else if (response.statusCode == 403) {
+        throw Exception('Access forbidden');
+      } else if (response.statusCode == 500) {
+        throw Exception('Internal server error');
+      } else if (response.statusCode == 502) {
+        throw Exception('Bad gateway');
+      } else if (response.statusCode == 503) {
+        throw Exception('Service unavailable');
+      } else if (ApiHelper.isUnauthorized(response)) {
+        throw Exception('Unauthorized');
       } else {
         throw Exception('Failed to load products: ${response.statusCode}');
       }
@@ -81,6 +91,14 @@ class ProductService {
       }
     } else if (response.statusCode == 404) {
       throw Exception('Product not found');
+    } else if (response.statusCode == 400) {
+      throw Exception('Bad request');
+    } else if (response.statusCode == 403) {
+      throw Exception('Access forbidden');
+    } else if (response.statusCode == 500) {
+      throw Exception('Internal server error');
+    } else if (ApiHelper.isUnauthorized(response)) {
+      throw Exception('Unauthorized');
     } else {
       throw Exception('Failed to load product: ${response.statusCode}');
     }
@@ -123,6 +141,14 @@ class ProductService {
       } else if (response.statusCode == 400) {
         final data = jsonDecode(response.body);
         throw Exception(data['message'] ?? 'Validation error');
+      } else if (response.statusCode == 409) {
+        throw Exception('Product already exists');
+      } else if (response.statusCode == 403) {
+        throw Exception('Access forbidden');
+      } else if (response.statusCode == 500) {
+        throw Exception('Internal server error');
+      } else if (ApiHelper.isUnauthorized(response)) {
+        throw Exception('Unauthorized');
       } else {
         throw Exception('Failed to create product: ${response.statusCode}');
       }
@@ -162,6 +188,16 @@ class ProductService {
     } else if (response.statusCode == 400) {
       final data = jsonDecode(response.body);
       throw Exception(data['error'] ?? data['message'] ?? 'Validation error');
+    } else if (response.statusCode == 404) {
+      throw Exception('Product not found');
+    } else if (response.statusCode == 403) {
+      throw Exception('Access forbidden');
+    } else if (response.statusCode == 409) {
+      throw Exception('Conflict - product may have been modified');
+    } else if (response.statusCode == 500) {
+      throw Exception('Internal server error');
+    } else if (ApiHelper.isUnauthorized(response)) {
+      throw Exception('Unauthorized');
     } else {
       throw Exception('Failed to update product: ${response.statusCode}');
     }
@@ -198,6 +234,16 @@ Future<bool> deleteProduct(int productId) async {
         return true;
       }
       return false;
+    } else if (response.statusCode == 404) {
+      throw Exception('Product not found');
+    } else if (response.statusCode == 403) {
+      throw Exception('Access forbidden');
+    } else if (response.statusCode == 409) {
+      throw Exception('Cannot delete - product is in use');
+    } else if (response.statusCode == 500) {
+      throw Exception('Internal server error');
+    } else if (ApiHelper.isUnauthorized(response)) {
+      throw Exception('Unauthorized');
     } else {
       throw Exception('Failed to delete product: ${response.statusCode}');
     }
@@ -206,6 +252,7 @@ Future<bool> deleteProduct(int productId) async {
     rethrow;
   }
 }
+
   Future<List<Product>> searchProducts({
     String? category,
     String? type,
@@ -242,6 +289,16 @@ Future<bool> deleteProduct(int productId) async {
         } else {
           throw Exception(data['message'] ?? 'Failed to search products');
         }
+      } else if (response.statusCode == 404) {
+        throw Exception('No products found matching search criteria');
+      } else if (response.statusCode == 400) {
+        throw Exception('Invalid search parameters');
+      } else if (response.statusCode == 403) {
+        throw Exception('Access forbidden');
+      } else if (response.statusCode == 500) {
+        throw Exception('Internal server error');
+      } else if (ApiHelper.isUnauthorized(response)) {
+        throw Exception('Unauthorized');
       } else {
         throw Exception('Failed to search products: ${response.statusCode}');
       }

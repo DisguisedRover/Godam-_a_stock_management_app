@@ -3,8 +3,9 @@ import 'package:provider/provider.dart';
 
 import '../constants/constants.dart';
 import '../providers/theme_provider.dart';
-import '../services/auth_service.dart';
+import '../services/auth/auth_service.dart';
 import '../theme/app_theme.dart';
+import '../utils/auth_guard.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -20,11 +21,23 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
 
   @override
+  void initState() {
+    super.initState();
+    _checkAuthentication();
+  }
+
+  Future<void> _checkAuthentication() async {
+    final isAuthenticated = await AuthGuard.checkAuth(context);
+    if (!isAuthenticated) {
+      return; 
+    }
+    _loadUserName();
+  }
+
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (_userName == null) {
-      _loadUserName();
-    }
   }
 
   Future<void> _loadUserName() async {
@@ -260,9 +273,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
+   
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
@@ -294,7 +305,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
               ),
               Text(
-                'Management your stock',
+                'Manage your stock',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: Theme.of(context).textTheme.bodySmall?.color,
                     ),
@@ -397,12 +408,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 12),
                 _buildFeatureCard(
                   context,
-                  'Stock Management',
-                  'Track inventory levels and movements',
+                  'Product Details',
+                  'Product specifications',
                   Icons.inventory_2_rounded,
                   Colors.blue,
                   () {
-                    // Navigate to stock management
+                    Navigator.pushNamed(context, '/product_details_list');
                   },
                 ),
                 const SizedBox(height: 12),
@@ -437,7 +448,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildGreetingHeader(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     
     return Card(
       elevation: 5,

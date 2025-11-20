@@ -4,7 +4,6 @@ import 'package:milk_content_analysis/bloc/signupBloc/signup_bloc.dart';
 import 'package:milk_content_analysis/bloc/signupBloc/signup_event.dart';
 import 'package:milk_content_analysis/bloc/signupBloc/signup_state.dart';
 import '../../constants/constants.dart';
-import '../../services/auth_service.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -24,7 +23,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final FocusNode _emailFocusNode = FocusNode();
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
-  // Focus nodes
   final FocusNode _nameFocusNode = FocusNode();
 
   final TextEditingController _passwordController = TextEditingController();

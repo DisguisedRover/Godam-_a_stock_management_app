@@ -1,5 +1,5 @@
 String httpScheme = 'https';
-String API_URL = '4a34154cf3c9.ngrok-free.app';
+String API_URL = '39f8e5daa15c.ngrok-free.app';
 int? portNo = null;
 
 
@@ -25,3 +25,12 @@ String editProductDetail = '/product/editProductDetail';
 String deleteProductDetail = '/product/deleteProductDetail';
 String getProductDetail = '/product/getAllProductDetail';
 String getProductdetailsById = '/product/getProductDetailById';
+String getProductdetaailsByProductId = '/product/getProductDetailByProductId';
+
+// warehouses
+String getWarehouses = '/warehouses/getAllWarehouses';
+String getWarehouseById = '/warehouses/getWarehouseById';
+String saveWarehouse = '/warehouses/saveWarehouse';
+String editWarehouse = '/warehouses/editWarehouse';
+String deleteWarehouse = '/warehouses/deleteWarehouse';
+

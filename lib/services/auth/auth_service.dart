@@ -3,13 +3,18 @@ import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../constants/constants.dart';
+import '../../constants/constants.dart';
 
 class AuthService {
   static const String _tokenKey = 'auth_token';
   static const String _userIdKey = 'user_id';
   static const String _userNameKey = 'user_name';
   static const String _userEmailKey = 'user_email';
+
+  static const String _rememberMeKey = 'remember_me';
+  static const String _rememberedIdentifierKey = 'remembered_identifier';
+  static const String _rememberedPasswordKey = 'remembered_password';
+
 
   Future<Map<String, dynamic>?> login(
     String identifier,
@@ -244,4 +249,41 @@ class AuthService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_userNameKey, newUserName);
   }
+
+  Future<void> saveRememberMeCredentials(String identifier, String password) async {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setBool(_rememberMeKey, true);
+  await prefs.setString(_rememberedIdentifierKey, identifier);
+  await prefs.setString(_rememberedPasswordKey, password);
+}
+
+Future<void> clearRememberMeCredentials() async {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setBool(_rememberMeKey, false);
+  await prefs.remove(_rememberedIdentifierKey);
+  await prefs.remove(_rememberedPasswordKey);
+}
+
+Future<Map<String, String>?> getRememberedCredentials() async {
+  final prefs = await SharedPreferences.getInstance();
+  final bool rememberMe = prefs.getBool(_rememberMeKey) ?? false;
+  
+  if (rememberMe) {
+    final String? identifier = prefs.getString(_rememberedIdentifierKey);
+    final String? password = prefs.getString(_rememberedPasswordKey);
+    
+    if (identifier != null && password != null) {
+      return {
+        'identifier': identifier,
+        'password': password,
+      };
+    }
+  }
+  return null;
+}
+
+Future<bool> isRememberMeEnabled() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getBool(_rememberMeKey) ?? false;
+}
 }

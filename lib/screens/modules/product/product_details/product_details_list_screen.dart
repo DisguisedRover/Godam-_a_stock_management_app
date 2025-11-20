@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:milk_content_analysis/bloc/productDetailsBloc/productDetails_event.dart';
 
-import '../../../bloc/productDetailsBloc/productDetails_bloc.dart';
-import '../../../bloc/productDetailsBloc/productDetails_state.dart';
-import '../../../model/product_details_model.dart';
+import '../../../../bloc/productDetailsBloc/productDetails_bloc.dart';
+import '../../../../bloc/productDetailsBloc/productDetails_state.dart';
+import '../../../../model/product_details_model.dart';
+import '../../../../utils/auth_guard.dart';
 
 class ProductDetailsListScreen extends StatefulWidget {
   const ProductDetailsListScreen({Key? key}) : super(key: key);
@@ -21,6 +22,9 @@ class _ProductDetailsListScreenState extends State<ProductDetailsListScreen> {
   void initState() {
     super.initState();
     _searchController.addListener(_onSearchChanged);
+     WidgetsBinding.instance.addPostFrameCallback((_) {
+    _checkAuthentication();
+  });
   }
 
   void _onSearchChanged() {
@@ -28,6 +32,10 @@ class _ProductDetailsListScreenState extends State<ProductDetailsListScreen> {
       _searchQuery = _searchController.text.toLowerCase();
     });
   }
+
+  Future<void> _checkAuthentication() async {
+  await AuthGuard.checkAuth(context);
+  } 
 
   @override
   void dispose() {

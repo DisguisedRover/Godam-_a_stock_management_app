@@ -19,6 +19,15 @@ class LoadProductDetailsById extends ProductDetailsEvent{
   List<Object?> get props => [productDetailsId];
  }
 
+
+class LoadProductDetailsByProductId extends ProductDetailsEvent{
+  final int productId;
+
+  const LoadProductDetailsByProductId(this.productId);
+
+  @override
+  List<Object?> get props => [productId];
+}
 class CreateProductDetails extends ProductDetailsEvent{
       final ProductDetails productDetails;
       

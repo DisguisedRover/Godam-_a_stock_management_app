@@ -12,10 +12,12 @@ class ProductDetailsBloc extends Bloc<ProductDetailsEvent, ProductDetailsState> 
       : _productDetailsService = productDetailsService ?? ProductDetailsService(),
       super(ProductDetailsInitial()) {
         on<LoadProductDetails>(_onLoadProductDetails);
+        on<LoadProductDetailsByProductId>(_onLoadProductDetailsByProductId);
         on<LoadProductDetailsById>(_onLoadProductDetailsById);
         on<CreateProductDetails>(_onCreateProductDetails);
         on<UpdateProductDetails>(_onUpdateProductDetails);
         on<DeleteProductDetails>(_onDeleteProductDetails);
+        
       }
 
 
@@ -33,7 +35,19 @@ class ProductDetailsBloc extends Bloc<ProductDetailsEvent, ProductDetailsState> 
         }
 
     }
-  
+  Future<void> _onLoadProductDetailsByProductId(
+    LoadProductDetailsByProductId event,
+    Emitter<ProductDetailsState> emit,
+  ) async {
+    emit(ProductDetailsLoading());
+    try {
+      final productDetail = await _productDetailsService.getProductDetailsByProductId(event.productId);
+      emit(ProductDetailLoaded(productDetail));
+    }catch (e) {
+      emit(ProductDetailsError(e.toString()));
+    }
+  }
+
   Future<void> _onLoadProductDetailsById(
     LoadProductDetailsById event,
     Emitter<ProductDetailsState> emit,
@@ -41,7 +55,7 @@ class ProductDetailsBloc extends Bloc<ProductDetailsEvent, ProductDetailsState> 
     emit(ProductDetailsLoading());
     try {
       final productDetail = await _productDetailsService.getProductDetailsById(event.productDetailsId);
-      emit(ProductDetailsLoaded(productDetail as List<ProductDetails>));
+      emit(ProductDetailLoaded(productDetail));
     }catch (e) {
       emit(ProductDetailsError(e.toString()));
     }
